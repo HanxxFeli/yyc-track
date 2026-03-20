@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Vite client types — gives TypeScript knowledge of import.meta.env */
+    "types": ["vite/client"],
+
+    /* Bundler mode — lets Vite handle the actual transpilation */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* JSX */
+    "jsx": "react-jsx",
+
+    /* Allow existing .jsx files to coexist with new .tsx files */
+    "allowJs": true,
+    "checkJs": false,
+
+    /* Strict enough to catch real bugs, not so strict it breaks existing JS */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.js", "src/**/*.jsx"],
+  "exclude": ["node_modules", "dist"]
+}

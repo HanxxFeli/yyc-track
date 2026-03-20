@@ -1,0 +1,63 @@
+# ── YYC Track — Monorepo Docker Compose ─────────────────────────────────────
+#
+# Runs the frontend and backend together locally:
+#   docker compose up
+#
+# Services:
+#   frontend  → Vite/React app   → http://localhost:3000
+#   backend   → Express API      → http://localhost:5000
+#
+# The Azure Functions are a separate repo (yyc-track-azure-functions)
+# deployed independently to Azure. Run them locally by going into
+# that repo and running: npm start
+#
+# For production:
+#   frontend → Vercel
+#   backend  → your hosting platform
+#   functions → Azure (separate repo, separate pipeline)
+
+version: "3.9"
+
+services:
+  # ── Frontend ────────────────────────────────────────────────────────────────
+  # Builds the Vite app and serves it with nginx on port 3000.
+  # nginx is used instead of Vite's dev server because this is a
+  # production-style build — see apps/frontend/nginx.conf for details.
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+      args:
+        # VITE_ vars are baked into the static files at build time.
+        # Point to Azure for the functions, local backend for the API.
+        VITE_AZURE_FUNCTIONS_URL: https://yyc-track-functions.azurewebsites.net/api
+        VITE_BACKEND_URL: http://localhost:5000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    networks:
+      - yyc-track
+
+  # ── Backend ─────────────────────────────────────────────────────────────────
+  # Express API — reads secrets from apps/backend/.env
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=development
+      - PORT=5000
+      - FRONTEND_URL=http://localhost:3000
+    env_file:
+      - ./apps/backend/.env
+    networks:
+      - yyc-track
+    restart: unless-stopped
+
+# ── Networks ──────────────────────────────────────────────────────────────────
+networks:
+  yyc-track:
+    driver: bridge
