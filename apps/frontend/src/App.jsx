@@ -34,6 +34,7 @@ import { CTrainProvider } from "./contexts/CtrainContext";
 import { StationProvider } from "./contexts/StationContext";
 import StationMonitoring from "./pages/StationMonitoring";
 import FeedbackManagement from "./pages/FeedbackManagement";
+import LandingPage from "./pages/LandingPage";
 
 /**
  * App Component
@@ -77,7 +78,7 @@ const AppContent = () => {
       <main className="flex-grow px-4 sm:px-6 lg:px py-6">
         <Routes>
           {/* public pages */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<LandingPage />} />
           <Route path="/map" element={<Home />} />
           <Route path="/stations" element={<Stations />} />
           
