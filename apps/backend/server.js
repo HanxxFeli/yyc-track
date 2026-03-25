@@ -49,11 +49,14 @@ const authRoutes = require('./routes/authRoutes') // import created authRoutes
 const userRoutes = require('./routes/userRoutes') // import created userRoutes
 const feedbackRoutes = require('./routes/feedbackRoutes') // import created feedbackRoutes
 const stationRoutes= require('./routes/stationRoutes')
+const analyticsRoutes = require('./routes/analyticsRoutes');
 
 app.use('/api/auth', authRoutes); // include all routes in authRoutes file
 app.use('/api/users', userRoutes); // include all routes in userRoutes file
 app.use('/api/feedback', feedbackRoutes); // include all routes in feedbackRoutes file
 app.use('/api/stations', stationRoutes);
+app.use('/api/admin/analytics', analyticsRoutes);
+
 // Temporary test route 
 app.get('/', (req, res) => { 
   res.json({
