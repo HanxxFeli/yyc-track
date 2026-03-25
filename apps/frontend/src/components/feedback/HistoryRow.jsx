@@ -57,12 +57,12 @@ const HistoryRow = ({ entry, onEdit, onDelete }) => {
       <div className="flex flex-col items-end gap-2 min-w-max">
         <span className="text-xs text-gray-400">{entry.date}</span>
         <div className="flex gap-2">
-          <button
+          {/* <button
             onClick={() => setIsEditing((prev) => !prev)}
             className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50 transition-colors text-gray-700"
           >
             Edit
-          </button>
+          </button> */}
           <button
             onClick={() => onDelete(entry.id)}
             className="text-xs bg-[#BC0B2A] text-white px-3 py-1 rounded hover:bg-[#9a0922] transition-colors"
