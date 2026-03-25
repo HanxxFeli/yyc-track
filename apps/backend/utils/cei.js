@@ -21,11 +21,11 @@ const mongoose = require("mongoose");
  */
 
 const WEIGHTS = {
-  safety: 0.25,
-  overall: 0.25,
+  safety: 0.2,
+  overall: 0.2,
   cleanliness: 0.2,
   accessibility: 0.2,
-  crowding: 0.1,
+  crowding: 0.2,
 };
 
 const recalculateStationCEI = async (stationId) => {

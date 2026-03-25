@@ -83,11 +83,11 @@ const getCEITrend = async (req, res) => {
                 $multiply: [
                   {
                     $add: [
-                      { $multiply: ["$avgSafety",        0.25] },
+                      { $multiply: ["$avgSafety",        0.20] },
                       { $multiply: ["$avgCleanliness",   0.20] },
                       { $multiply: ["$avgAccessibility", 0.20] },
-                      { $multiply: ["$avgCrowding",      0.10] },
-                      { $multiply: ["$avgOverall",       0.25] },
+                      { $multiply: ["$avgCrowding",      0.20] },
+                      { $multiply: ["$avgOverall",       0.20] },
                     ],
                   },
                   20,
@@ -340,11 +340,11 @@ const getStationCEITrend = async (req, res) => {
                 $multiply: [
                   {
                     $add: [
-                      { $multiply: ["$avgSafety",        0.25] },
+                      { $multiply: ["$avgSafety",        0.20] },
                       { $multiply: ["$avgCleanliness",   0.20] },
                       { $multiply: ["$avgAccessibility", 0.20] },
-                      { $multiply: ["$avgCrowding",      0.10] },
-                      { $multiply: ["$avgOverall",       0.25] },
+                      { $multiply: ["$avgCrowding",      0.20] },
+                      { $multiply: ["$avgOverall",       0.20] },
                     ],
                   },
                   20,
