@@ -26,6 +26,11 @@ const feedbackSchema = new mongoose.Schema(
       enum: ["none", "pending", "archived"],
       default: "none",
     },
+    sentiment: {
+      type: String,
+      enum: ["positive", "negative", "neutral", "mixed"],
+      default: null,
+    },
     isDeleted: { type: Boolean, default: false },
   },
   { timestamps: true }

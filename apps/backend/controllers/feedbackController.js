@@ -2,6 +2,7 @@ const Feedback = require("../models/Feedback");
 const Station = require("../models/Station");
 const User = require("../models/User");
 const { recalculateStationCEI } = require("../utils/cei");
+const { analyzeSentiment } = require("../utils/sentimentAnalysis");
 const { analyzeContent } = require("../utils/contentSafety");
 
 /**
@@ -39,7 +40,12 @@ const submitFeedback = async (req, res) => {
     }
 
     // Run comment through Azure Content Safety
-    const safetyResult = await analyzeContent(comment);
+    const [safetyResult, sentimentLabel] = await Promise.all( 
+      [
+        analyzeContent(comment),
+        analyzeSentiment(comment)
+      ]
+    );
     const flagStatus = safetyResult.flagged ? "pending" : "none";
 
     const feedback = await Feedback.create({
@@ -47,6 +53,7 @@ const submitFeedback = async (req, res) => {
       stationId,
       ratings,
       comment,
+      sentiment: sentimentLabel,
       flagStatus,
     });
 
