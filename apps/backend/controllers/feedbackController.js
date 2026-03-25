@@ -29,7 +29,6 @@ const submitFeedback = async (req, res) => {
       "cleanliness",
       "accessibility",
       "crowding",
-      "overall",
     ];
     for (const field of requiredFields) {
       if (ratings[field] === undefined || ratings[field] === null) {
