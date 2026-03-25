@@ -5,7 +5,7 @@ import {
   Routes,
   Route,
   BrowserRouter,
-  useLocation
+  useLocation,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
@@ -17,24 +17,28 @@ import Register from "./pages/Register";
 import VerifyEmail from "./pages/VerifyEmail";
 import AccountSettings from "./pages/AccountSettings";
 import ErrorPage from "./pages/ErrorPage";
-import AccountDeleted from './pages/AccountDeleted';
-import AuthLandingPage from './pages/AuthLandingPage';
-import AuthCallback from './pages/AuthCallback';
-import CompleteProfile from './pages/CompleteProfile'
-import ForgotPassword from './pages/ForgotPassword';
-import ResetPassword from './pages/ResetPassword';
-import Stations from './pages/Stations';
-import AdminLogin from './pages/AdminLogin';
-import AdminDashboard from './pages/AdminDashboard';
-import AdminHeader from './components/admin/AdminHeader';
-import AdminProtectedRoute from './components/admin/AdminProtectedRoute';
-import { AdminAuthProvider } from './contexts/AdminAuthContext';
-import FeedbackPage from './pages/FeedbackPage'
+import AccountDeleted from "./pages/AccountDeleted";
+import AuthLandingPage from "./pages/AuthLandingPage";
+import AuthCallback from "./pages/AuthCallback";
+import CompleteProfile from "./pages/CompleteProfile";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Stations from "./pages/Stations";
+import AdminLogin from "./pages/AdminLogin";  
+import AdminDashboard from "./pages/AdminDashboard";
+import AdminHeader from "./components/admin/AdminHeader";
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+import { AdminAuthProvider } from "./contexts/AdminAuthContext";
+import FeedbackPage from "./pages/FeedbackPage";
 import { CTrainProvider } from "./contexts/CtrainContext";
 import { StationProvider } from "./contexts/StationContext";
 import StationMonitoring from "./pages/StationMonitoring";
 import FeedbackManagement from "./pages/FeedbackManagement";
 import LandingPage from "./pages/LandingPage";
+// import PrivacyPolicy from "./pages/PrivacyPolicy";
+// import TermsOfService from "./pages/TermsOfService";
+import DataAnalytics from "./pages/DataAnalytics";
+
 
 /**
  * App Component
@@ -81,17 +85,20 @@ const AppContent = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/map" element={<Home />} />
           <Route path="/stations" element={<Stations />} />
-          
+          {/* <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} /> */}
+          <Route path="/analytics" element={<DataAnalytics />} />
+
           {/* Admin Routes */}
           <Route
-            path='/admin/*'
+            path="/admin/*"
             element={
               <AdminAuthProvider>
                 <Routes>
                   <Route path="login" element={<AdminLogin />} />
                   {/* All admin routes should be protected */}
-                  <Route 
-                    path='dashboard'
+                  <Route
+                    path="dashboard"
                     element={
                       <AdminProtectedRoute>
                         <AdminDashboard />
@@ -99,15 +106,15 @@ const AppContent = () => {
                     }
                   />
                   <Route
-                    path='stations'
+                    path="stations"
                     element={
                       <AdminProtectedRoute>
                         <StationMonitoring />
                       </AdminProtectedRoute>
                     }
-                  /> 
+                  />
                   <Route
-                    path='feedback'
+                    path="feedback"
                     element={
                       <AdminProtectedRoute>
                         <FeedbackManagement />
@@ -117,55 +124,118 @@ const AppContent = () => {
                 </Routes>
               </AdminAuthProvider>
             }
-          /> 
+          />
 
-            {/* User Login and Registration pages */}
-            <Route path="/login" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><Login /></div>} />
-            <Route path="/register" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><Register /></div>} />
-            <Route path="/verify-email" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><VerifyEmail /></div>} />
-            <Route path="/forgot-password" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><ForgotPassword /></div>} />
-            <Route path="/reset-password/:token" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><ResetPassword /></div>} />
+          {/* User Login and Registration pages */}
+          <Route
+            path="/login"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <Login />
+              </div>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <Register />
+              </div>
+            }
+          />
+          <Route
+            path="/verify-email"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <VerifyEmail />
+              </div>
+            }
+          />
+          <Route
+            path="/forgot-password"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <ForgotPassword />
+              </div>
+            }
+          />
+          <Route
+            path="/reset-password/:token"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <ResetPassword />
+              </div>
+            }
+          />
 
-            {/* OAuth routes */}
-            <Route path="/auth/callback" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><AuthCallback /></div>} />
-            <Route path="/complete-profile" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><CompleteProfile /></div>} />
+          {/* OAuth routes */}
+          <Route
+            path="/auth/callback"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <AuthCallback />
+              </div>
+            }
+          />
+          <Route
+            path="/complete-profile"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <CompleteProfile />
+              </div>
+            }
+          />
 
-            {/* Protected routes - wrap with ProtectedRoute */}
-            <Route
-              path="/account-settings"
-              element={
-                <ProtectedRoute>
-                  <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
-                    <AccountSettings />
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/dashboard"
-              element={
-                <ProtectedRoute>
-                  <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
-                    <AuthLandingPage />
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/feedback"
-              element={
-                <ProtectedRoute>
-                  <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
-                    <FeedbackPage />
-                  </div>
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/account-deleted" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><AccountDeleted /></div>} />
+          {/* Protected routes - wrap with ProtectedRoute */}
+          <Route
+            path="/account-settings"
+            element={
+              <ProtectedRoute>
+                <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                  <AccountSettings />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                  <AuthLandingPage />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/feedback"
+            element={
+              <ProtectedRoute>
+                <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                  <FeedbackPage />
+                </div>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/account-deleted"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <AccountDeleted />
+              </div>
+            }
+          />
 
-            {/* 404 catch-all route - must be last */}
-            <Route path="*" element={<div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10"><ErrorPage /></div>} />
-          </Routes>        
+          {/* 404 catch-all route - must be last */}
+          <Route
+            path="*"
+            element={
+              <div className="px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-10">
+                <ErrorPage />
+              </div>
+            }
+          />
+        </Routes>
       </main>
 
       {/* Global Footer */}
