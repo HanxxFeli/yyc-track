@@ -299,6 +299,34 @@ const adminDeleteFeedback = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Admin Reverts any Chanages they made to a feedback
+ * @route   PATCH /api/feedback/admin/:feedbackId/revert
+ * @access  Admin
+ */
+const adminRevertFeedback= async(req, res)=>{
+  try{
+    const feedback= await Feedback.findById(req.params.feedbackId);
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found." });
+    }
+
+    const stationId = feedback.stationId;
+
+    //Revert to 'pending' and isDeleted back to false
+    feedback.isDeleted= false
+    feedback.flagStatus='pending'
+    await feedback.save()
+    await recalculateStationCEI()
+
+    res.json({message:"Feedback Status Reverted"})
+  }
+  catch(err){
+    console.error("adminRevertFeedback error:", err);
+    res.status(500).json({ error: "Server error. Please try again." });
+  }
+}
+
 module.exports = {
   submitFeedback,
   getFeedbackByStation,
