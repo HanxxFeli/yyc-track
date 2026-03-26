@@ -4,7 +4,8 @@
  * - This component is a reusable column for displaying either approved or rejected feedback.
  * - Displays a title, and list of feedback entries
  */
-function ArchiveColumn({ title, titleColor, rows }) {
+function ArchiveColumn({ title, titleColor, rows, onUndo }) {
+
   return (
     <div className="rounded-xl bg-white border border-gray-200 shadow-sm overflow-hidden">
 
@@ -50,6 +51,16 @@ function ArchiveColumn({ title, titleColor, rows }) {
               <div className="mt-3 text-xs text-gray-500">
                 {row.submitted}
               </div>
+              
+              {/* Undo Button */}
+              <div className="flex justify-end mt-3">
+                <button 
+                  onClick={() => onUndo(row.id)}
+                  className="h-9 px-5 rounded-xl text-sm font-medium border border-gray-300 text-gray-500 bg-white hover:bg-gray-100 transition-all duration-150"
+                >
+                  Undo
+                </button>
+              </div>
             </div>
           ))
         )}
@@ -64,7 +75,8 @@ function ArchiveColumn({ title, titleColor, rows }) {
  * - Displays two column side by side (one for approved and one for rejected)
  * - Renders two ArchiveColumn components side-by-side
  */
-export default function FeedbackArchive({ approved, rejected}) {
+export default function FeedbackArchive({ approved, rejected, onUndoApproved, onUndoRejected }) {
+  
   return (
     <div className="space-y-4">
 
@@ -81,6 +93,7 @@ export default function FeedbackArchive({ approved, rejected}) {
           title="Approved"
           titleColor="text-green-700"
           rows={approved}
+          onUndo={onUndoApproved}
         />
 
         {/* Rejected Feedback Column */}
@@ -88,6 +101,7 @@ export default function FeedbackArchive({ approved, rejected}) {
           title="Rejected"
           titleColor="text-red-700"
           rows={rejected}
+          onUndo={onUndoRejected}
         />
       </div>
     </div>

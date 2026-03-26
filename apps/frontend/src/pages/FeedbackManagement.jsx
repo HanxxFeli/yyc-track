@@ -28,12 +28,21 @@ const API_URI='http://localhost:5000'
 export default function FeedbackManagement() {
   const { stations } = useStations();
 
+  /**
+   * states
+   * 
+   * toReview -> pending feedback
+   * approved -> approved feedback
+   * rejected -> rejected feedback
+   */
   const [toReview, setToReview] = useState([]);
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // filter state (controls the search, station filter, and sorting)
   const [filters, setFilters] = useState({
     query: "",
     station: "all",
@@ -72,6 +81,7 @@ export default function FeedbackManagement() {
     },
   ];
 
+  // auth header for admin API calls
   const authHeader = {
     Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
   };
@@ -107,8 +117,17 @@ export default function FeedbackManagement() {
     };
 
     fetchFeedback();
-  }, []);
+  }, []); 
 
+  /**
+   * filter + search logic
+   * 
+   * - runs whenever filters or data change
+   * - filters by:
+   *  - search query
+   *  - station
+   *  - sorting option
+   */
   const filteredToReview = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
     let data = [...toReview];
@@ -136,9 +155,11 @@ export default function FeedbackManagement() {
     return data;
   }, [toReview, filters]);
 
+  // updates a specific filter
   const onChange = (key, value) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
 
+  // resets all filters back to default
   const onClear = () =>
     setFilters({ query: "", station: "all", status: "needs_review", sort: "newest" });
 
@@ -162,7 +183,7 @@ export default function FeedbackManagement() {
       setToReview((prev) => prev.filter((item) => item.id !== id));
     } catch (err) {
       console.error("onApprove error:", err);
-    }
+    } 
   };
 
   /**
@@ -186,7 +207,35 @@ export default function FeedbackManagement() {
     } catch (err) {
       console.error("onReject error:", err);
     }
-  };
+  }; 
+
+  /**
+   * undo (approved back to review)
+   * 
+   * - moves item back to "toReview"
+   * - frontend only rn
+   */
+  const handleUndoApproved = (id) => {
+  const item = approved.find((f) => f.id === id);
+  if (!item) return;
+
+  setApproved((prev) => prev.filter((f) => f.id !== id));
+  setToReview((prev) => [item, ...prev]);
+};
+
+/**
+ * undo (reject back to review)
+ * 
+ * - moved item back to "toReview
+ * - frontend only rn
+ */
+const handleUndoRejected = (id) => {
+  const item = rejected.find((f) => f.id === id);
+  if (!item) return;
+
+  setRejected((prev) => prev.filter((f) => f.id !== id));
+  setToReview((prev) => [item, ...prev]);
+};
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
@@ -223,6 +272,8 @@ export default function FeedbackManagement() {
           <FeedbackArchive
             approved={approved}
             rejected={rejected}
+            onUndoApproved={handleUndoApproved}
+            onUndoRejected={handleUndoRejected}
           />
         </>
       )}
