@@ -41,12 +41,12 @@ const recalculateStationCEI = async (stationId) => {
       // Step 2: Group all feedback together and compute per-category averages
       $group: {
         _id: "$stationId",
-        totalFeedback:    { $sum: 1 },
-        avgSafety:        { $avg: "$ratings.safety" },
-        avgCleanliness:   { $avg: "$ratings.cleanliness" },
+        totalFeedback: { $sum: 1 },
+        avgSafety: { $avg: "$ratings.safety" },
+        avgCleanliness: { $avg: "$ratings.cleanliness" },
         avgAccessibility: { $avg: "$ratings.accessibility" },
-        avgCrowding:      { $avg: "$ratings.crowding" },
-        avgOverall:       { $avg: "$ratings.overall" },
+        avgCrowding: { $avg: "$ratings.crowding" },
+        avgOverall: { $avg: "$ratings.overall" },
       },
     },
     {
@@ -57,11 +57,11 @@ const recalculateStationCEI = async (stationId) => {
 
         // Store rounded per-category averages for the station dashboard charts
         averageRatings: {
-          safety:        { $round: ["$avgSafety", 2] },
-          cleanliness:   { $round: ["$avgCleanliness", 2] },
+          safety: { $round: ["$avgSafety", 2] },
+          cleanliness: { $round: ["$avgCleanliness", 2] },
           accessibility: { $round: ["$avgAccessibility", 2] },
-          crowding:      { $round: ["$avgCrowding", 2] },
-          overall:       { $round: ["$avgOverall", 2] },
+          crowding: { $round: ["$avgCrowding", 2] },
+          overall: { $round: ["$avgOverall", 2] },
         },
 
         // Weighted average then scaled: (weightedAvg / 5) * 100
@@ -71,11 +71,11 @@ const recalculateStationCEI = async (stationId) => {
               $multiply: [
                 {
                   $add: [
-                    { $multiply: ["$avgSafety",        WEIGHTS.safety] },
-                    { $multiply: ["$avgCleanliness",   WEIGHTS.cleanliness] },
+                    { $multiply: ["$avgSafety", WEIGHTS.safety] },
+                    { $multiply: ["$avgCleanliness", WEIGHTS.cleanliness] },
                     { $multiply: ["$avgAccessibility", WEIGHTS.accessibility] },
-                    { $multiply: ["$avgCrowding",      WEIGHTS.crowding] },
-                    { $multiply: ["$avgOverall",       WEIGHTS.overall] },
+                    { $multiply: ["$avgCrowding", WEIGHTS.crowding] },
+                    { $multiply: ["$avgOverall", WEIGHTS.overall] },
                   ],
                 },
                 25, // scale 1-5 range to 20-100

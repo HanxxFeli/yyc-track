@@ -15,7 +15,7 @@ const SCORE_FIELDS = [
   { key: "crowding", label: "Crowding" },
 ];
 
-const API_URI='http://localhost:5000'
+const API_URL = "http://localhost:5000";
 
 const MAX_COMMENT = 1000;
 
@@ -51,7 +51,8 @@ const FeedbackPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const overall = computeOverall(scores);
-  const setScore = (key) => (val) => setScores((prev) => ({ ...prev, [key]: val }));
+  const setScore = (key) => (val) =>
+    setScores((prev) => ({ ...prev, [key]: val }));
 
   // Set default selected station once stations load
   useEffect(() => {
@@ -61,21 +62,21 @@ const FeedbackPage = () => {
   }, [stations]);
 
   const fetchHistory = async () => {
-      try {
-        const res = await fetch(`${API_URI}/api/feedback/mine`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-          },
-        });
-        if (!res.ok) throw new Error("Failed to fetch feedback history");
-        const data = await res.json();
-        setHistory(data.feedback);
-      } catch (err) {
-        console.error("fetchHistory error:", err);
-      } finally {
-        setHistoryLoading(false);
-      }
-    };
+    try {
+      const res = await fetch(`${API_URL}/api/feedback/mine`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+        },
+      });
+      if (!res.ok) throw new Error("Failed to fetch feedback history");
+      const data = await res.json();
+      setHistory(data.feedback);
+    } catch (err) {
+      console.error("fetchHistory error:", err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
   // Fetch user's own feedback history on mount
   useEffect(() => {
@@ -91,9 +92,13 @@ const FeedbackPage = () => {
       return;
     }
 
-    const invalidScores = SCORE_FIELDS.filter(({ key }) => !isValidScore(scores[key]));
+    const invalidScores = SCORE_FIELDS.filter(
+      ({ key }) => !isValidScore(scores[key]),
+    );
     if (invalidScores.length) {
-      setErrorMsg("Please ensure all category scores are whole numbers between 1 and 5.");
+      setErrorMsg(
+        "Please ensure all category scores are whole numbers between 1 and 5.",
+      );
       return;
     }
 
@@ -105,7 +110,7 @@ const FeedbackPage = () => {
     setIsSubmitting(true);
 
     try {
-      const res = await fetch(`${API_URI}/api/feedback`, {
+      const res = await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,11 +119,11 @@ const FeedbackPage = () => {
         body: JSON.stringify({
           stationId: selectedStation._id,
           ratings: {
-            safety:        Number(scores.safety),
-            cleanliness:   Number(scores.cleanliness),
+            safety: Number(scores.safety),
+            cleanliness: Number(scores.cleanliness),
             accessibility: Number(scores.accessibility),
-            crowding:      Number(scores.crowding),
-            overall:       overall ?? 1,
+            crowding: Number(scores.crowding),
+            overall: overall ?? 1,
           },
           comment,
         }),
@@ -131,8 +136,8 @@ const FeedbackPage = () => {
         return;
       }
 
-      await fetchHistory()
-      
+      await fetchHistory();
+
       // Check if azure content safety allowed it to pass
       if (data.notice) {
         setErrorMsg(data.notice);
@@ -140,7 +145,12 @@ const FeedbackPage = () => {
         setSuccessMsg("Your feedback has been submitted successfully!");
         setTimeout(() => setSuccessMsg(""), 4000);
       }
-      setScores({ cleanliness: "", safety: "", accessibility: "", crowding: "" });
+      setScores({
+        cleanliness: "",
+        safety: "",
+        accessibility: "",
+        crowding: "",
+      });
       setComment("");
       setTimeout(() => setSuccessMsg(""), 4000);
     } catch (err) {
@@ -160,7 +170,7 @@ const FeedbackPage = () => {
 
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`${API_URI}/api/feedback/${id}`, {
+      const res = await fetch(`${API_URL}/api/feedback/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`,
@@ -180,49 +190,55 @@ const FeedbackPage = () => {
   };
 
   const filteredHistory = history.filter((f) =>
-    f.stationId?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    f.stationId?.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Station Feedback</h1>
-          <p className="text-sm sm:text-base text-gray-600">Share your experience and help improve Calgary Transit</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            Station Feedback
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
+            Share your experience and help improve Calgary Transit
+          </p>
         </div>
 
         <div className="space-y-6 sm:space-y-8">
-
           {/* FEEDBACK FORM SECTION */}
           <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
             <div className="p-4 sm:p-6 lg:p-8">
-
               <div className="mb-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Share Your Feedback</h2>
-                <p className="text-sm text-gray-500">Rate and review a CTrain station</p>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+                  Share Your Feedback
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Rate and review a CTrain station
+                </p>
               </div>
 
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-
                 <div className="xl:col-span-2 space-y-6">
-
                   {/* Station dropdown from context */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Station
                     </label>
                     {stationsLoading ? (
-                      <div className="text-sm text-gray-400">Loading stations...</div>
+                      <div className="text-sm text-gray-400">
+                        Loading stations...
+                      </div>
                     ) : (
                       <select
                         value={selectedStation?._id || ""}
                         onChange={(e) => {
-                          const station = stations.find((s) => s._id === e.target.value);
+                          const station = stations.find(
+                            (s) => s._id === e.target.value,
+                          );
                           setSelectedStation(station);
                         }}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#BC0B2A] focus:border-transparent transition"
-                      >
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#BC0B2A] focus:border-transparent transition">
                         {stations.map((s) => (
                           <option key={s._id} value={s._id}>
                             {s.name}
@@ -244,7 +260,9 @@ const FeedbackPage = () => {
                           label={label}
                           value={scores[key]}
                           onChange={setScore(key)}
-                          invalid={scores[key] !== "" && !isValidScore(scores[key])}
+                          invalid={
+                            scores[key] !== "" && !isValidScore(scores[key])
+                          }
                         />
                       ))}
                     </div>
@@ -262,7 +280,8 @@ const FeedbackPage = () => {
                       placeholder="Describe your experience at this station..."
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#BC0B2A] focus:border-transparent transition"
                     />
-                    <div className={`text-right text-xs mt-1.5 ${comment.length > MAX_COMMENT ? "text-red-500 font-medium" : "text-gray-500"}`}>
+                    <div
+                      className={`text-right text-xs mt-1.5 ${comment.length > MAX_COMMENT ? "text-red-500 font-medium" : "text-gray-500"}`}>
                       {comment.length} / {MAX_COMMENT}
                     </div>
                   </div>
@@ -273,38 +292,41 @@ const FeedbackPage = () => {
                       <PrimaryButton
                         onClick={handleSubmit}
                         isLoading={isSubmitting}
-                        loadingText="Submitting..."
-                      >
+                        loadingText="Submitting...">
                         Submit Feedback
                       </PrimaryButton>
                     </div>
                     <div className="flex-1 sm:flex-initial sm:w-32">
-                      <SecondaryButton onClick={handleClear} disabled={isSubmitting}>
+                      <SecondaryButton
+                        onClick={handleClear}
+                        disabled={isSubmitting}>
                         Clear
                       </SecondaryButton>
                     </div>
                   </div>
-
                 </div>
 
                 {/* Overall score + messages */}
                 <div className="xl:col-span-1">
                   <div className="bg-gray-50 rounded-lg p-6 space-y-4 border border-gray-200">
                     <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600 mb-2">Overall CFI Score</p>
+                      <p className="text-sm font-medium text-gray-600 mb-2">
+                        Overall CFI Score
+                      </p>
                       <div className="text-5xl sm:text-6xl font-bold text-gray-900 mb-1">
                         {overall !== null ? overall : "—"}
                       </div>
                       <p className="text-xs text-gray-500">out of 5</p>
                     </div>
-                    {(errorMsg || successMsg) && <div className="border-t border-gray-300" />}
+                    {(errorMsg || successMsg) && (
+                      <div className="border-t border-gray-300" />
+                    )}
                     <div className="space-y-3">
                       <ErrorMessage message={errorMsg} />
                       <SuccessMessage message={successMsg} />
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -312,11 +334,14 @@ const FeedbackPage = () => {
           {/* FEEDBACK HISTORY SECTION */}
           <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
             <div className="p-4 sm:p-6 lg:p-8">
-
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Feedback History</h2>
-                  <p className="text-sm text-gray-500">View and manage your submissions</p>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+                    Feedback History
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    View and manage your submissions
+                  </p>
                 </div>
                 <div className="relative w-full sm:w-64">
                   <input
@@ -331,20 +356,34 @@ const FeedbackPage = () => {
               </div>
 
               <div className="hidden lg:grid lg:grid-cols-[2fr_3fr_1fr_100px] gap-4 px-4 pb-3 mb-4 border-b border-gray-200">
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Station</span>
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Feedback</span>
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Date</span>
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Actions</span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Station
+                </span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Feedback
+                </span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Date
+                </span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Actions
+                </span>
               </div>
 
               <div className="space-y-3 lg:space-y-2">
                 {historyLoading ? (
-                  <div className="text-center py-12 text-sm text-gray-400">Loading history...</div>
+                  <div className="text-center py-12 text-sm text-gray-400">
+                    Loading history...
+                  </div>
                 ) : filteredHistory.length === 0 ? (
                   <div className="text-center py-12">
                     <FiFileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-sm text-gray-500 mb-1">No feedback found</p>
-                    <p className="text-xs text-gray-400">Try adjusting your search or submit new feedback</p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      No feedback found
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Try adjusting your search or submit new feedback
+                    </p>
                   </div>
                 ) : (
                   filteredHistory.map((entry) => (
@@ -354,11 +393,11 @@ const FeedbackPage = () => {
                         id: entry._id,
                         station: entry.stationId?.name,
                         comment: entry.comment,
-                        cleanliness:   entry.ratings?.cleanliness,
-                        safety:        entry.ratings?.safety,
+                        cleanliness: entry.ratings?.cleanliness,
+                        safety: entry.ratings?.safety,
                         accessibility: entry.ratings?.accessibility,
-                        crowding:      entry.ratings?.crowding,
-                        overall:       entry.ratings?.overall,
+                        crowding: entry.ratings?.crowding,
+                        overall: entry.ratings?.overall,
                         date: new Date(entry.createdAt).toLocaleDateString(),
                       }}
                       onDelete={handleDelete}
@@ -366,10 +405,8 @@ const FeedbackPage = () => {
                   ))
                 )}
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>
