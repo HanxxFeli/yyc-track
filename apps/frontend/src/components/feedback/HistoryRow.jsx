@@ -4,21 +4,14 @@
  *
  * Props:
  * - entry (object): { id, station, comment, cleanliness, safety, accessibility, crowding, overall, date }
- * - onEdit (fn): called with (id, newComment) when the user saves an edit
  * - onDelete (fn): called with (id) when the user clicks Delete
  */
 
-import { useState } from "react";
-import PrimaryButton from "../buttons/PrimaryButton";
+import React, { useState } from 'react';
 
-const HistoryRow = ({ entry, onEdit, onDelete }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [draftComment, setDraftComment] = useState(entry.comment);
+const HistoryRow = ({ entry, onDelete }) => {
 
-  const handleSave = () => {
-    onEdit(entry.id, draftComment);
-    setIsEditing(false);
-  };
+  const [showConfirm, setShowConfirm] = useState(false);
 
   return (
     <div className="grid grid-cols-[1fr_2fr_auto] gap-4 py-4 items-start border-b last:border-b-0">
@@ -31,21 +24,7 @@ const HistoryRow = ({ entry, onEdit, onDelete }) => {
 
       {/* Comment — swaps to a textarea in edit mode */}
       <div>
-        {isEditing ? (
-          <div className="space-y-2">
-            <textarea
-              value={draftComment}
-              onChange={(e) => setDraftComment(e.target.value)}
-              rows={3}
-              className="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-[#BC0B2A]"
-            />
-            <div className="w-20">
-              <PrimaryButton onClick={handleSave}>Save</PrimaryButton>
-            </div>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-700">{entry.comment}</p>
-        )}
+        <p className="text-sm text-gray-700">{entry.comment}</p>
 
         {/* Score summary line */}
         <p className="text-xs text-gray-400 mt-1">
@@ -53,22 +32,33 @@ const HistoryRow = ({ entry, onEdit, onDelete }) => {
         </p>
       </div>
 
-      {/* Date + Edit / Delete actions */}
+      {/* Date / Delete actions */}
       <div className="flex flex-col items-end gap-2 min-w-max">
         <span className="text-xs text-gray-400">{entry.date}</span>
         <div className="flex gap-2">
-          {/* <button
-            onClick={() => setIsEditing((prev) => !prev)}
-            className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50 transition-colors text-gray-700"
-          >
-            Edit
-          </button> */}
-          <button
-            onClick={() => onDelete(entry.id)}
-            className="text-xs bg-[#BC0B2A] text-white px-3 py-1 rounded hover:bg-[#9a0922] transition-colors"
-          >
-            Delete
-          </button>
+          {showConfirm ? (
+            <>
+            <button
+              onClick={() => setShowConfirm(false)}
+              className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => onDelete(entry.id)}
+                className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
+                >
+                  Confirm Delete?
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => setShowConfirm(true)}
+                className="text-xs bg-[#BC0B2A] text-white px-3 py-1 rounded hover:bg-[#9a0922] transition-colors"
+              >
+                Delete
+            </button>
+            )}
         </div>
       </div>
     </div>
