@@ -22,10 +22,9 @@ const mongoose = require("mongoose");
 
 const WEIGHTS = {
   safety: 0.25,
-  overall: 0.25,
-  cleanliness: 0.2,
-  accessibility: 0.2,
-  crowding: 0.1,
+  cleanliness: 0.25,
+  accessibility: 0.25,
+  crowding: 0.25,
 };
 
 const recalculateStationCEI = async (stationId) => {
@@ -79,7 +78,7 @@ const recalculateStationCEI = async (stationId) => {
                     { $multiply: ["$avgOverall",       WEIGHTS.overall] },
                   ],
                 },
-                20, // scale 1-5 range to 20-100
+                25, // scale 1-5 range to 20-100
               ],
             },
             1, // round to 1 decimal place
