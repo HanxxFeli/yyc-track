@@ -24,7 +24,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Stations from "./pages/Stations";
-import AdminLogin from "./pages/AdminLogin";  
+import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminHeader from "./components/admin/AdminHeader";
 import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
@@ -38,7 +38,6 @@ import LandingPage from "./pages/LandingPage";
 // import PrivacyPolicy from "./pages/PrivacyPolicy";
 // import TermsOfService from "./pages/TermsOfService";
 import DataAnalytics from "./pages/DataAnalytics";
-
 
 /**
  * App Component
@@ -87,7 +86,7 @@ const AppContent = () => {
           <Route path="/stations" element={<Stations />} />
           {/* <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} /> */}
-          <Route path="/analytics" element={<DataAnalytics />} />
+          {/* <Route path="/analytics" element={<DataAnalytics />} /> */}
 
           {/* Admin Routes */}
           <Route
@@ -118,6 +117,14 @@ const AppContent = () => {
                     element={
                       <AdminProtectedRoute>
                         <FeedbackManagement />
+                      </AdminProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="analytics"
+                    element={
+                      <AdminProtectedRoute>
+                        <DataAnalytics />
                       </AdminProtectedRoute>
                     }
                   />
