@@ -8,12 +8,7 @@ const mongoose = require("mongoose");
  * Weighted average of all 5 rating categories across ALL submissions
  * for a station, scaled to 0-100.
  *
- * Weights reflect what matters most to commuters:
- *   Safety:        25%
- *   Overall:       25%
- *   Cleanliness:   20%
- *   Accessibility: 20%
- *   Crowding:      10%
+ *
  *
  * Example: weighted avg = 3.8 out of 5 → CEI = (3.8 / 5) * 100 = 76.0
  *
@@ -75,10 +70,9 @@ const recalculateStationCEI = async (stationId) => {
                     { $multiply: ["$avgCleanliness", WEIGHTS.cleanliness] },
                     { $multiply: ["$avgAccessibility", WEIGHTS.accessibility] },
                     { $multiply: ["$avgCrowding", WEIGHTS.crowding] },
-                    { $multiply: ["$avgOverall", WEIGHTS.overall] },
                   ],
                 },
-                25, // scale 1-5 range to 20-100
+                20,
               ],
             },
             1, // round to 1 decimal place

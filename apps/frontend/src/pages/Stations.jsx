@@ -88,9 +88,6 @@ export default function Stations() {
 
   const { stations: rawStations, loading, error } = useStations();
   const stations = useMemo(() => rawStations.map(mapStation), [rawStations]);
-
-  console.log(stations[0]);
-
   const filteredStations = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
 

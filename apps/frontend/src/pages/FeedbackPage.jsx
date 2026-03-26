@@ -33,7 +33,7 @@ const computeOverall = (scores) => {
 };
 
 const FeedbackPage = () => {
-  const { stations, loading: stationsLoading } = useStations();
+  const { stations, loading: stationsLoading, refreshStations } = useStations();
 
   const [selectedStation, setSelectedStation] = useState(null);
   const [scores, setScores] = useState({
@@ -137,6 +137,8 @@ const FeedbackPage = () => {
       }
 
       await fetchHistory();
+
+      refreshStations();
 
       // Check if azure content safety allowed it to pass
       if (data.notice) {
