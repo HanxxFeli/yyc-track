@@ -317,7 +317,7 @@ const adminRevertFeedback= async(req, res)=>{
     feedback.isDeleted= false
     feedback.flagStatus='pending'
     await feedback.save()
-    await recalculateStationCEI()
+    await recalculateStationCEI(stationId)
 
     res.json({message:"Feedback Status Reverted"})
   }
@@ -336,5 +336,6 @@ module.exports = {
   getArchivedFeedback,
   approveFeedback,
   adminDeleteFeedback,
-  getDeletedFeedback
+  getDeletedFeedback,
+  adminRevertFeedback
 };
