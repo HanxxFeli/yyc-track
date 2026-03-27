@@ -8,7 +8,7 @@
 
 import { FiFileText } from "react-icons/fi";
 import FeedbackCard from "../feedback/FeedbackCard";
-import FeedbackFilterBar from "./FeedbackFilterBar";
+import FeedbackFilterBar from "./FeedbackfilterBar";
 
 export default function FeedbackList({
   feedback,
