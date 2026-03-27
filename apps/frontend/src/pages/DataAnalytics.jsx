@@ -71,10 +71,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAdminAuth } from '../contexts/AdminAuthContext'; // admin-specific context — exposes token stored under "adminToken" in localStorage
 
-import CEITrendChart       from './analytics/CEITrendChart';
-import CategoryScoresChart from './analytics/CategoryScoresChart';
-import StationRankings     from './analytics/StationRankings';
-import FeedbackSentiment   from './analytics/FeedbackSentiment';
+import CEITrendChart from '../components/analytics/CEITrendChart';
+import CategoryScoresChart from '../components/analytics/CategoryScoresChart';
+import StationRankings from '../components/analytics/StationRankings';
+import FeedbackSentiment from '../components/analytics/FeedbackSentiment';
 
 const API_URL = 'http://localhost:5000/api'; // matches PORT in .env
 
