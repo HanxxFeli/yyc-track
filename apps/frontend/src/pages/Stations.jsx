@@ -71,16 +71,15 @@ const mapStation = (s) => ({
   condition: getCondition(s.cei),
   cei: s.cei,
   metrics: {
-    cleanliness:   s.averageRatings?.cleanliness   ?? "N/A",
-    safety:        s.averageRatings?.safety         ?? "N/A",
-    accessibility: s.averageRatings?.accessibility  ?? "N/A",
-    crowding:      s.averageRatings?.crowding       ?? "N/A",
+    cleanliness: s.averageRatings?.cleanliness ?? "N/A",
+    safety: s.averageRatings?.safety ?? "N/A",
+    accessibility: s.averageRatings?.accessibility ?? "N/A",
+    crowding: s.averageRatings?.crowding ?? "N/A",
   },
   imageUrl: s.imageUrl ?? null,
 });
 
 export default function Stations() {
-
   const [filters, setFilters] = useState({
     query: "",
     condition: "all",
@@ -89,13 +88,14 @@ export default function Stations() {
 
   const { stations: rawStations, loading, error } = useStations();
   const stations = useMemo(() => rawStations.map(mapStation), [rawStations]);
-
   const filteredStations = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
 
     return stations
       .filter((s) => (q ? s.name.toLowerCase().includes(q) : true))
-      .filter((s) => (filters.condition === "all" ? true : s.condition === filters.condition))
+      .filter((s) =>
+        filters.condition === "all" ? true : s.condition === filters.condition,
+      )
       .filter((s) => (filters.line === "all" ? true : s.line === filters.line));
   }, [filters, stations]);
 
@@ -107,7 +107,6 @@ export default function Stations() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-
       {/* Page Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-gray-900">CTrain Stations</h1>
@@ -129,15 +128,15 @@ export default function Stations() {
         <p className="text-sm text-gray-400 pt-2">Loading stations...</p>
       )}
 
-      {error && (
-        <p className="text-sm text-red-500 pt-2">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-500 pt-2">{error}</p>}
 
       {/* Station List */}
       {!loading && !error && (
         <div className="space-y-5 pt-1">
           {filteredStations.length === 0 ? (
-            <p className="text-sm text-gray-500">No stations match your filters.</p>
+            <p className="text-sm text-gray-500">
+              No stations match your filters.
+            </p>
           ) : (
             filteredStations.map((station) => (
               <StationCard key={station.id} station={station} />
@@ -145,7 +144,6 @@ export default function Stations() {
           )}
         </div>
       )}
-
     </div>
   );
 }

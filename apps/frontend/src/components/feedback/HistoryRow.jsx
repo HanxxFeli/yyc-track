@@ -7,19 +7,16 @@
  * - onDelete (fn): called with (id) when the user clicks Delete
  */
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 const HistoryRow = ({ entry, onDelete }) => {
-
   const [showConfirm, setShowConfirm] = useState(false);
 
   return (
     <div className="grid grid-cols-[1fr_2fr_auto] gap-4 py-4 items-start border-b last:border-b-0">
-
-      {/* Station name + anonymous label */}
+      {/* Station name */}
       <div>
         <p className="text-sm font-semibold text-gray-800">{entry.station}</p>
-        <p className="text-xs text-gray-400 mt-0.5">Anonymous</p>
       </div>
 
       {/* Comment — swaps to a textarea in edit mode */}
@@ -28,7 +25,9 @@ const HistoryRow = ({ entry, onDelete }) => {
 
         {/* Score summary line */}
         <p className="text-xs text-gray-400 mt-1">
-          Cleanliness: {entry.cleanliness} | Safety: {entry.safety} | Accessibility: {entry.accessibility} | Crowding: {entry.crowding} | Overall: {entry.overall}
+          Cleanliness: {entry.cleanliness} | Safety: {entry.safety} |
+          Accessibility: {entry.accessibility} | Crowding: {entry.crowding} |
+          Overall: {entry.overall}
         </p>
       </div>
 
@@ -38,27 +37,24 @@ const HistoryRow = ({ entry, onDelete }) => {
         <div className="flex gap-2">
           {showConfirm ? (
             <>
-            <button
-              onClick={() => setShowConfirm(false)}
-              className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50"
-              >
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-50">
                 Cancel
               </button>
               <button
                 onClick={() => onDelete(entry.id)}
-                className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
-                >
-                  Confirm Delete?
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={() => setShowConfirm(true)}
-                className="text-xs bg-[#BC0B2A] text-white px-3 py-1 rounded hover:bg-[#9a0922] transition-colors"
-              >
-                Delete
+                className="text-xs bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700">
+                Confirm Delete?
+              </button>
+            </>
+          ) : (
+            <button
+              onClick={() => setShowConfirm(true)}
+              className="text-xs bg-[#BC0B2A] text-white px-3 py-1 rounded hover:bg-[#9a0922] transition-colors">
+              Delete
             </button>
-            )}
+          )}
         </div>
       </div>
     </div>
