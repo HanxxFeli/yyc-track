@@ -53,16 +53,16 @@ const getCEITrend = async (req, res) => {
         // Group by day — compute weighted CEI per day across all stations
         $group: {
           _id: {
-            year:  { $year: "$createdAt" },
+            year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
-            day:   { $dayOfMonth: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
           },
-          avgSafety:        { $avg: "$ratings.safety" },
-          avgCleanliness:   { $avg: "$ratings.cleanliness" },
+          avgSafety: { $avg: "$ratings.safety" },
+          avgCleanliness: { $avg: "$ratings.cleanliness" },
           avgAccessibility: { $avg: "$ratings.accessibility" },
-          avgCrowding:      { $avg: "$ratings.crowding" },
-          avgOverall:       { $avg: "$ratings.overall" },
-          feedbackCount:    { $sum: 1 },
+          avgCrowding: { $avg: "$ratings.crowding" },
+          avgOverall: { $avg: "$ratings.overall" },
+          feedbackCount: { $sum: 1 },
         },
       },
       {
@@ -70,9 +70,9 @@ const getCEITrend = async (req, res) => {
           _id: 0,
           date: {
             $dateFromParts: {
-              year:  "$_id.year",
+              year: "$_id.year",
               month: "$_id.month",
-              day:   "$_id.day",
+              day: "$_id.day",
             },
           },
           feedbackCount: 1,
@@ -83,13 +83,13 @@ const getCEITrend = async (req, res) => {
                 $multiply: [
                   {
                     $add: [
-                      { $multiply: ["$avgSafety",        0.25] },
-                      { $multiply: ["$avgCleanliness",   0.25] },
+                      { $multiply: ["$avgSafety", 0.25] },
+                      { $multiply: ["$avgCleanliness", 0.25] },
                       { $multiply: ["$avgAccessibility", 0.25] },
-                      { $multiply: ["$avgCrowding",      0.25] },
+                      { $multiply: ["$avgCrowding", 0.25] },
                     ],
                   },
-                  25,
+                  20,
                 ],
               },
               1,
@@ -139,12 +139,12 @@ const getCategoryAverages = async (req, res) => {
       {
         $group: {
           _id: null,
-          totalFeedback:    { $sum: 1 },
-          avgSafety:        { $avg: "$ratings.safety" },
-          avgCleanliness:   { $avg: "$ratings.cleanliness" },
+          totalFeedback: { $sum: 1 },
+          avgSafety: { $avg: "$ratings.safety" },
+          avgCleanliness: { $avg: "$ratings.cleanliness" },
           avgAccessibility: { $avg: "$ratings.accessibility" },
-          avgCrowding:      { $avg: "$ratings.crowding" },
-          avgOverall:       { $avg: "$ratings.overall" },
+          avgCrowding: { $avg: "$ratings.crowding" },
+          avgOverall: { $avg: "$ratings.overall" },
         },
       },
       {
@@ -152,11 +152,11 @@ const getCategoryAverages = async (req, res) => {
           _id: 0,
           totalFeedback: 1,
           averages: {
-            safety:        { $round: ["$avgSafety", 2] },
-            cleanliness:   { $round: ["$avgCleanliness", 2] },
+            safety: { $round: ["$avgSafety", 2] },
+            cleanliness: { $round: ["$avgCleanliness", 2] },
             accessibility: { $round: ["$avgAccessibility", 2] },
-            crowding:      { $round: ["$avgCrowding", 2] },
-            overall:       { $round: ["$avgOverall", 2] },
+            crowding: { $round: ["$avgCrowding", 2] },
+            overall: { $round: ["$avgOverall", 2] },
           },
         },
       },
@@ -258,7 +258,7 @@ const getStationRankings = async (req, res) => {
       .select("name line cei averageRatings totalFeedback")
       .sort({ cei: -1 }); // highest CEI first
 
-    const top5    = stations.slice(0, 5);
+    const top5 = stations.slice(0, 5);
     const bottom5 = stations.slice(-5).reverse(); // lowest CEI first
 
     res.json({
@@ -310,16 +310,16 @@ const getStationCEITrend = async (req, res) => {
       {
         $group: {
           _id: {
-            year:  { $year: "$createdAt" },
+            year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
-            day:   { $dayOfMonth: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
           },
-          avgSafety:        { $avg: "$ratings.safety" },
-          avgCleanliness:   { $avg: "$ratings.cleanliness" },
+          avgSafety: { $avg: "$ratings.safety" },
+          avgCleanliness: { $avg: "$ratings.cleanliness" },
           avgAccessibility: { $avg: "$ratings.accessibility" },
-          avgCrowding:      { $avg: "$ratings.crowding" },
-          avgOverall:       { $avg: "$ratings.overall" },
-          feedbackCount:    { $sum: 1 },
+          avgCrowding: { $avg: "$ratings.crowding" },
+          avgOverall: { $avg: "$ratings.overall" },
+          feedbackCount: { $sum: 1 },
         },
       },
       {
@@ -327,9 +327,9 @@ const getStationCEITrend = async (req, res) => {
           _id: 0,
           date: {
             $dateFromParts: {
-              year:  "$_id.year",
+              year: "$_id.year",
               month: "$_id.month",
-              day:   "$_id.day",
+              day: "$_id.day",
             },
           },
           feedbackCount: 1,
@@ -339,13 +339,13 @@ const getStationCEITrend = async (req, res) => {
                 $multiply: [
                   {
                     $add: [
-                      { $multiply: ["$avgSafety",        0.25] },
-                      { $multiply: ["$avgCleanliness",   0.25] },
+                      { $multiply: ["$avgSafety", 0.25] },
+                      { $multiply: ["$avgCleanliness", 0.25] },
                       { $multiply: ["$avgAccessibility", 0.25] },
-                      { $multiply: ["$avgCrowding",      0.25] },
+                      { $multiply: ["$avgCrowding", 0.25] },
                     ],
                   },
-                  25,
+                  20,
                 ],
               },
               1,
@@ -402,12 +402,12 @@ const getStationCategoryAverages = async (req, res) => {
       {
         $group: {
           _id: null,
-          totalFeedback:    { $sum: 1 },
-          avgSafety:        { $avg: "$ratings.safety" },
-          avgCleanliness:   { $avg: "$ratings.cleanliness" },
+          totalFeedback: { $sum: 1 },
+          avgSafety: { $avg: "$ratings.safety" },
+          avgCleanliness: { $avg: "$ratings.cleanliness" },
           avgAccessibility: { $avg: "$ratings.accessibility" },
-          avgCrowding:      { $avg: "$ratings.crowding" },
-          avgOverall:       { $avg: "$ratings.overall" },
+          avgCrowding: { $avg: "$ratings.crowding" },
+          avgOverall: { $avg: "$ratings.overall" },
         },
       },
       {
@@ -415,11 +415,11 @@ const getStationCategoryAverages = async (req, res) => {
           _id: 0,
           totalFeedback: 1,
           averages: {
-            safety:        { $round: ["$avgSafety", 2] },
-            cleanliness:   { $round: ["$avgCleanliness", 2] },
+            safety: { $round: ["$avgSafety", 2] },
+            cleanliness: { $round: ["$avgCleanliness", 2] },
             accessibility: { $round: ["$avgAccessibility", 2] },
-            crowding:      { $round: ["$avgCrowding", 2] },
-            overall:       { $round: ["$avgOverall", 2] },
+            crowding: { $round: ["$avgCrowding", 2] },
+            overall: { $round: ["$avgOverall", 2] },
           },
         },
       },
@@ -543,9 +543,9 @@ const getStationFeedbackVolume = async (req, res) => {
       {
         $group: {
           _id: {
-            year:  { $year: "$createdAt" },
+            year: { $year: "$createdAt" },
             month: { $month: "$createdAt" },
-            day:   { $dayOfMonth: "$createdAt" },
+            day: { $dayOfMonth: "$createdAt" },
           },
           count: { $sum: 1 },
         },
@@ -555,9 +555,9 @@ const getStationFeedbackVolume = async (req, res) => {
           _id: 0,
           date: {
             $dateFromParts: {
-              year:  "$_id.year",
+              year: "$_id.year",
               month: "$_id.month",
-              day:   "$_id.day",
+              day: "$_id.day",
             },
           },
           count: 1,

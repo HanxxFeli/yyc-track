@@ -38,6 +38,7 @@ import LandingPage from "./pages/LandingPage";
 // import PrivacyPolicy from "./pages/PrivacyPolicy";
 // import TermsOfService from "./pages/TermsOfService";
 import DataAnalytics from "./pages/DataAnalytics";
+import StationDetails from "./pages/StationDetails";
 
 /**
  * App Component
@@ -87,6 +88,7 @@ const AppContent = () => {
           {/* <Route path="/terms" element={<TermsOfService />} />
           <Route path="/privacy" element={<PrivacyPolicy />} /> */}
           {/* <Route path="/analytics" element={<DataAnalytics />} /> */}
+          <Route path="/stations/:stationId" element={<StationDetails />} />
 
           {/* Admin Routes */}
           <Route

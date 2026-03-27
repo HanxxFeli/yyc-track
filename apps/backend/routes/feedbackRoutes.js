@@ -11,6 +11,7 @@ const {
   getDeletedFeedback,
   approveFeedback,
   adminDeleteFeedback,
+  adminRevertFeedback,
 } = require("../controllers/feedbackController");
 
 // ─────────────────────────────────────────────
@@ -35,5 +36,6 @@ router.get("/admin/archived", protectAdmin, getArchivedFeedback);
 router.get("/admin/deleted", protectAdmin, getDeletedFeedback);
 router.patch("/admin/:feedbackId/approve", protectAdmin, approveFeedback);
 router.delete("/admin/:feedbackId", protectAdmin, adminDeleteFeedback);
+router.patch("/admin/:feedbackId/revert", protectAdmin, adminRevertFeedback);
 
 module.exports = router;

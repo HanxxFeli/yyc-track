@@ -38,8 +38,7 @@ const computeOverall = (scores) => {
 };
 
 const FeedbackPage = () => {
-  // Get stations from context (comes from backend API via StationContext)
-  const { stations, loading: stationsLoading } = useStations();
+  const { stations, loading: stationsLoading, refreshStations } = useStations();
 
   // Form state
   const [selectedStation, setSelectedStation] = useState(null); // Currently selected station object
@@ -61,9 +60,8 @@ const FeedbackPage = () => {
 
   // Calculate overall score (average of 4 categories)
   const overall = computeOverall(scores);
-  
-  // Helper function to update a single score field
-  const setScore = (key) => (val) => setScores((prev) => ({ ...prev, [key]: val }));
+  const setScore = (key) => (val) =>
+    setScores((prev) => ({ ...prev, [key]: val }));
 
   // Set default selected station once stations load from context
   useEffect(() => {
@@ -75,18 +73,18 @@ const FeedbackPage = () => {
   // Fetch user's feedback history from backend
   const fetchHistory = async () => {
     try {
-      const res = await fetch(`${API_URI}/api/feedback/mine`, {
+      const res = await fetch(`${API_URL}/api/feedback/mine`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("authToken")}`, // Send JWT token for auth
+          Authorization: `Bearer ${localStorage.getItem("authToken")}`,
         },
       });
       if (!res.ok) throw new Error("Failed to fetch feedback history");
       const data = await res.json();
-      setHistory(data.feedback); // Update history state with user's feedback
+      setHistory(data.feedback);
     } catch (err) {
       console.error("fetchHistory error:", err);
     } finally {
-      setHistoryLoading(false); // Stop loading spinner
+      setHistoryLoading(false);
     }
   };
 
@@ -106,10 +104,13 @@ const FeedbackPage = () => {
       return;
     }
 
-    // Validation: ensure all scores are valid (1-5 whole numbers)
-    const invalidScores = SCORE_FIELDS.filter(({ key }) => !isValidScore(scores[key]));
+    const invalidScores = SCORE_FIELDS.filter(
+      ({ key }) => !isValidScore(scores[key]),
+    );
     if (invalidScores.length) {
-      setErrorMsg("Please ensure all category scores are whole numbers between 1 and 5.");
+      setErrorMsg(
+        "Please ensure all category scores are whole numbers between 1 and 5.",
+      );
       return;
     }
 
@@ -122,21 +123,20 @@ const FeedbackPage = () => {
     setIsSubmitting(true); // Show loading state on button
 
     try {
-      // POST request to backend API
-      const res = await fetch(`${API_URI}/api/feedback`, {
+      const res = await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("authToken")}`, // JWT token
         },
         body: JSON.stringify({
-          stationId: selectedStation._id, // MongoDB station ID
-          ratings: { // Send all ratings
+          stationId: selectedStation._id,
+          ratings: {
             safety: Number(scores.safety),
             cleanliness: Number(scores.cleanliness),
             accessibility: Number(scores.accessibility),
             crowding: Number(scores.crowding),
-            overall: overall ?? 1, // Use calculated overall or default to 1
+            overall: overall ?? 1,
           },
           comment, // User's text feedback
         }),
@@ -150,19 +150,23 @@ const FeedbackPage = () => {
         return;
       }
 
-      // Refresh history to show newly submitted feedback
       await fetchHistory();
-      
-      // Check if Azure Content Safety flagged the content
+
+      refreshStations();
+
+      // Check if azure content safety allowed it to pass
       if (data.notice) {
         setErrorMsg(data.notice); // Show moderation notice
       } else {
         setSuccessMsg("Your feedback has been submitted successfully!");
         setTimeout(() => setSuccessMsg(""), 4000); // Clear success message after 4 seconds
       }
-      
-      // Reset form after successful submission
-      setScores({ cleanliness: "", safety: "", accessibility: "", crowding: "" });
+      setScores({
+        cleanliness: "",
+        safety: "",
+        accessibility: "",
+        crowding: "",
+      });
       setComment("");
       
     } catch (err) {
@@ -184,7 +188,7 @@ const FeedbackPage = () => {
   // Delete a feedback entry from history
   const handleDelete = async (id) => {
     try {
-      const res = await fetch(`${API_URI}/api/feedback/${id}`, {
+      const res = await fetch(`${API_URL}/api/feedback/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("authToken")}`, // JWT token
@@ -206,54 +210,57 @@ const FeedbackPage = () => {
 
   // Filter history based on search query (searches station name)
   const filteredHistory = history.filter((f) =>
-    f.stationId?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+    f.stationId?.name?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   return (
-    <div className="min-h-screen bg-gray-50"> {/* Full page container */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10"> {/* Responsive container */}
-
-        {/* Page header */}
+    <div className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         <div className="mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Station Feedback</h1>
-          <p className="text-sm sm:text-base text-gray-600">Share your experience and help improve Calgary Transit</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+            Station Feedback
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600">
+            Share your experience and help improve Calgary Transit
+          </p>
         </div>
 
-        <div className="space-y-6 sm:space-y-8"> {/* Vertical spacing between sections */}
-
+        <div className="space-y-6 sm:space-y-8">
           {/* FEEDBACK FORM SECTION */}
           <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
-            <div className="p-4 sm:p-6 lg:p-8"> {/* Responsive padding */}
-
-              {/* Form title */}
+            <div className="p-4 sm:p-6 lg:p-8">
               <div className="mb-6">
-                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Share Your Feedback</h2>
-                <p className="text-sm text-gray-500">Rate and review a CTrain station</p>
+                <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+                  Share Your Feedback
+                </h2>
+                <p className="text-sm text-gray-500">
+                  Rate and review a CTrain station
+                </p>
               </div>
 
               {/* Grid layout: 2 columns on xl screens, stacks on smaller screens */}
               <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-
-                {/* Left side: Form inputs (takes 2 cols on xl) */}
                 <div className="xl:col-span-2 space-y-6">
-
-                  {/* Station dropdown - populated from StationContext */}
+                  {/* Station dropdown from context */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Select Station
                     </label>
-                    {stationsLoading ? ( // Show loading text while stations are being fetched
-                      <div className="text-sm text-gray-400">Loading stations...</div>
+                    {stationsLoading ? (
+                      <div className="text-sm text-gray-400">
+                        Loading stations...
+                      </div>
                     ) : (
                       <select
                         value={selectedStation?._id || ""} // Controlled select with station ID
                         onChange={(e) => {
-                          const station = stations.find((s) => s._id === e.target.value); // Find station object by ID
-                          setSelectedStation(station); // Update selected station
+                          const station = stations.find(
+                            (s) => s._id === e.target.value,
+                          );
+                          setSelectedStation(station);
                         }}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#BC0B2A] focus:border-transparent transition"
-                      >
-                        {stations.map((s) => ( // Map through all stations from context
+                        className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#BC0B2A] focus:border-transparent transition">
+                        {stations.map((s) => (
                           <option key={s._id} value={s._id}>
                             {s.name}
                           </option>
@@ -273,9 +280,11 @@ const FeedbackPage = () => {
                         <ScoreInput
                           key={key}
                           label={label}
-                          value={scores[key]} // Current score value
-                          onChange={setScore(key)} // Update specific score
-                          invalid={scores[key] !== "" && !isValidScore(scores[key])} // Show error if invalid
+                          value={scores[key]}
+                          onChange={setScore(key)}
+                          invalid={
+                            scores[key] !== "" && !isValidScore(scores[key])
+                          }
                         />
                       ))}
                     </div>
@@ -293,8 +302,8 @@ const FeedbackPage = () => {
                       placeholder="Describe your experience at this station..."
                       className="w-full border border-gray-300 rounded-lg px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#BC0B2A] focus:border-transparent transition"
                     />
-                    {/* Character counter - turns red if over limit */}
-                    <div className={`text-right text-xs mt-1.5 ${comment.length > MAX_COMMENT ? "text-red-500 font-medium" : "text-gray-500"}`}>
+                    <div
+                      className={`text-right text-xs mt-1.5 ${comment.length > MAX_COMMENT ? "text-red-500 font-medium" : "text-gray-500"}`}>
                       {comment.length} / {MAX_COMMENT}
                     </div>
                   </div>
@@ -304,19 +313,19 @@ const FeedbackPage = () => {
                     <div className="flex-1 sm:flex-initial sm:w-44">
                       <PrimaryButton
                         onClick={handleSubmit}
-                        isLoading={isSubmitting} // Shows spinner during submit
-                        loadingText="Submitting..."
-                      >
+                        isLoading={isSubmitting}
+                        loadingText="Submitting...">
                         Submit Feedback
                       </PrimaryButton>
                     </div>
                     <div className="flex-1 sm:flex-initial sm:w-32">
-                      <SecondaryButton onClick={handleClear} disabled={isSubmitting}>
+                      <SecondaryButton
+                        onClick={handleClear}
+                        disabled={isSubmitting}>
                         Clear
                       </SecondaryButton>
                     </div>
                   </div>
-
                 </div>
 
                 {/* Right side: Overall score display (takes 1 col on xl) */}
@@ -324,22 +333,23 @@ const FeedbackPage = () => {
                   <div className="bg-gray-50 rounded-lg p-6 space-y-4 border border-gray-200">
                     {/* Overall CFI Score - calculated average */}
                     <div className="text-center">
-                      <p className="text-sm font-medium text-gray-600 mb-2">Overall CFI Score</p>
+                      <p className="text-sm font-medium text-gray-600 mb-2">
+                        Overall CFI Score
+                      </p>
                       <div className="text-5xl sm:text-6xl font-bold text-gray-900 mb-1">
                         {overall !== null ? overall : "—"} {/* Show dash if no scores entered */}
                       </div>
                       <p className="text-xs text-gray-500">out of 5</p>
                     </div>
-                    {/* Divider if there are messages */}
-                    {(errorMsg || successMsg) && <div className="border-t border-gray-300" />}
-                    {/* Error and success messages */}
+                    {(errorMsg || successMsg) && (
+                      <div className="border-t border-gray-300" />
+                    )}
                     <div className="space-y-3">
                       <ErrorMessage message={errorMsg} />
                       <SuccessMessage message={successMsg} />
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
           </div>
@@ -347,12 +357,14 @@ const FeedbackPage = () => {
           {/* FEEDBACK HISTORY SECTION */}
           <div className="bg-white rounded-lg sm:rounded-xl shadow-sm border border-gray-200">
             <div className="p-4 sm:p-6 lg:p-8">
-
-              {/* Header with search */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">Feedback History</h2>
-                  <p className="text-sm text-gray-500">View and manage your submissions</p>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 mb-1">
+                    Feedback History
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    View and manage your submissions
+                  </p>
                 </div>
                 {/* Search input with icon */}
                 <div className="relative w-full sm:w-64">
@@ -369,21 +381,35 @@ const FeedbackPage = () => {
 
               {/* Desktop table headers (hidden on mobile) */}
               <div className="hidden lg:grid lg:grid-cols-[2fr_3fr_1fr_100px] gap-4 px-4 pb-3 mb-4 border-b border-gray-200">
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Station</span>
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Feedback</span>
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Date</span>
-                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Actions</span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Station
+                </span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Feedback
+                </span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Date
+                </span>
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  Actions
+                </span>
               </div>
 
               {/* History rows */}
               <div className="space-y-3 lg:space-y-2">
-                {historyLoading ? ( // Show loading state
-                  <div className="text-center py-12 text-sm text-gray-400">Loading history...</div>
-                ) : filteredHistory.length === 0 ? ( // Show empty state if no results
+                {historyLoading ? (
+                  <div className="text-center py-12 text-sm text-gray-400">
+                    Loading history...
+                  </div>
+                ) : filteredHistory.length === 0 ? (
                   <div className="text-center py-12">
                     <FiFileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-sm text-gray-500 mb-1">No feedback found</p>
-                    <p className="text-xs text-gray-400">Try adjusting your search or submit new feedback</p>
+                    <p className="text-sm text-gray-500 mb-1">
+                      No feedback found
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Try adjusting your search or submit new feedback
+                    </p>
                   </div>
                 ) : ( // Map through filtered history and display rows
                   filteredHistory.map((entry) => (
@@ -398,17 +424,15 @@ const FeedbackPage = () => {
                         accessibility: entry.ratings?.accessibility,
                         crowding: entry.ratings?.crowding,
                         overall: entry.ratings?.overall,
-                        date: new Date(entry.createdAt).toLocaleDateString(), // Format timestamp
+                        date: new Date(entry.createdAt).toLocaleDateString(),
                       }}
                       onDelete={handleDelete} // Pass delete handler
                     />
                   ))
                 )}
               </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>
