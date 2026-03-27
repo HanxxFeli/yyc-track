@@ -35,6 +35,9 @@ import { StationProvider } from "./contexts/StationContext";
 import StationMonitoring from "./pages/StationMonitoring";
 import FeedbackManagement from "./pages/FeedbackManagement";
 import LandingPage from "./pages/LandingPage";
+// import PrivacyPolicy from "./pages/PrivacyPolicy";
+// import TermsOfService from "./pages/TermsOfService";
+import DataAnalytics from "./pages/DataAnalytics";
 import StationDetails from "./pages/StationDetails";
 
 /**
@@ -82,6 +85,9 @@ const AppContent = () => {
           <Route path="/" element={<LandingPage />} />
           <Route path="/map" element={<Home />} />
           <Route path="/stations" element={<Stations />} />
+          {/* <Route path="/terms" element={<TermsOfService />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} /> */}
+          {/* <Route path="/analytics" element={<DataAnalytics />} /> */}
           <Route path="/stations/:stationId" element={<StationDetails />} />
 
           {/* Admin Routes */}
@@ -113,6 +119,14 @@ const AppContent = () => {
                     element={
                       <AdminProtectedRoute>
                         <FeedbackManagement />
+                      </AdminProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="analytics"
+                    element={
+                      <AdminProtectedRoute>
+                        <DataAnalytics />
                       </AdminProtectedRoute>
                     }
                   />
