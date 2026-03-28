@@ -198,6 +198,7 @@ const Header = () => {
 
                   {/* Logout Button */}
                   <button
+                    data-testid="logout-button"
                     type="button"
                     onClick={handleLogout} 
                     className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded-md text-sm text-red-600"

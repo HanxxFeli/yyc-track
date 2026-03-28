@@ -189,8 +189,8 @@ const Register = () => {
           </p>
         </div>
 
-        {/* Success message - only shown after successful registration */}
-        {success && <SuccessMessage message="Account created successfully!" />}
+        {/* Success message (shown after registration) */}
+        {success && <SuccessMessage message="Account created successfully!" data-testid="success-message"/>}
 
         {/* Registration form */}
         <form onSubmit={handleSubmit}>
@@ -203,6 +203,7 @@ const Register = () => {
                 First Name
               </label>
               <input
+                data-testid="register-firstname"
                 type="text"
                 name="firstName"
                 value={formData.firstName}
@@ -223,6 +224,7 @@ const Register = () => {
                 Last Name
               </label>
               <input
+                data-testid="register-lastname"
                 type="text"
                 name="lastName"
                 value={formData.lastName}
@@ -240,6 +242,7 @@ const Register = () => {
 
           {/* Email input - using reusable InputField component */}
           <InputField
+            data-testid="register-email"
             label="Email"
             type="email"
             name="email"
@@ -251,6 +254,7 @@ const Register = () => {
 
           {/* Password input - using reusable PasswordField component (has show/hide toggle) */}
           <PasswordField
+            data-testid="register-password"
             label="Password"
             name="password"
             value={formData.password}
@@ -267,6 +271,7 @@ const Register = () => {
           
           {/* Confirm password input */}
           <PasswordField
+            data-testid="register-confirm"
             label="Confirm Password"
             name="confirmPassword"
             value={formData.confirmPassword}
@@ -301,8 +306,8 @@ const Register = () => {
             error={errors.agreeToTerms}
           />
 
-          {/* Submit button - shows loading state during API call */}
-          <SubmitButton isLoading={isLoading}>
+          {/* Submit button */}
+          <SubmitButton isLoading={isLoading} data-testid="register-submit">
             Create Account
           </SubmitButton>
 

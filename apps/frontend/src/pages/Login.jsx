@@ -58,6 +58,7 @@ export default function Login() {
           
           {/* Email */}
           <LoginInputField
+            data-testid="email-input"
             label="Email"
             name="email"
             type="email"
@@ -69,6 +70,7 @@ export default function Login() {
 
           {/* Password */}
           <LoginPasswordField
+            data-testid="password-input"
             label="Password"
             name="password"
             value={password}
@@ -81,7 +83,7 @@ export default function Login() {
           {error && (
             <div className="flex items-start gap-2 bg-red-100 text-red-700 border border-red-300 p-3 rounded mb-4">
               <AiOutlineWarning size={20} className="flex-shrink-0 mt-0.5" />
-              <p className="text-sm sm:text-base">{error}</p>
+              <p className="text-sm sm:text-base" data-testid="error-message">{error}</p>
             </div>
           )}
 
@@ -98,7 +100,7 @@ export default function Login() {
           </div>
 
           {/* Login Button */}
-          <LoginSubmitButton isLoading={isLoading}>
+          <LoginSubmitButton isLoading={isLoading} data-testid="login-submit">
             Login
           </LoginSubmitButton>
 
