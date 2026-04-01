@@ -19,7 +19,7 @@ const SCORE_FIELDS = [
 // Added backend feedback integration
 
 // Backend API URL - change this for production
-const API_URI = 'http://localhost:5000';
+const API_URL = "http://localhost:5000";
 
 // Maximum character limit for feedback comments
 const MAX_COMMENT = 1000;
@@ -42,7 +42,8 @@ const FeedbackPage = () => {
 
   // Form state
   const [selectedStation, setSelectedStation] = useState(null); // Currently selected station object
-  const [scores, setScores] = useState({ // Four category scores (1-5)
+  const [scores, setScores] = useState({
+    // Four category scores (1-5)
     cleanliness: "",
     safety: "",
     accessibility: "",
@@ -168,7 +169,6 @@ const FeedbackPage = () => {
         crowding: "",
       });
       setComment("");
-      
     } catch (err) {
       console.error("handleSubmit error:", err);
       setErrorMsg("Something went wrong. Please try again.");
@@ -337,7 +337,8 @@ const FeedbackPage = () => {
                         Overall CFI Score
                       </p>
                       <div className="text-5xl sm:text-6xl font-bold text-gray-900 mb-1">
-                        {overall !== null ? overall : "—"} {/* Show dash if no scores entered */}
+                        {overall !== null ? overall : "—"}{" "}
+                        {/* Show dash if no scores entered */}
                       </div>
                       <p className="text-xs text-gray-500">out of 5</p>
                     </div>
@@ -411,7 +412,8 @@ const FeedbackPage = () => {
                       Try adjusting your search or submit new feedback
                     </p>
                   </div>
-                ) : ( // Map through filtered history and display rows
+                ) : (
+                  // Map through filtered history and display rows
                   filteredHistory.map((entry) => (
                     <HistoryRow
                       key={entry._id} // Unique key for each row
