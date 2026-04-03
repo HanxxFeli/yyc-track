@@ -39,6 +39,7 @@ import LandingPage from "./pages/LandingPage";
 // import TermsOfService from "./pages/TermsOfService";
 import DataAnalytics from "./pages/DataAnalytics";
 import StationDetails from "./pages/StationDetails";
+import StationAnalytics from "./pages/StationAnalytics";
 
 /**
  * App Component
@@ -127,6 +128,14 @@ const AppContent = () => {
                     element={
                       <AdminProtectedRoute>
                         <DataAnalytics />
+                      </AdminProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="stations/:stationId"
+                    element={
+                      <AdminProtectedRoute>
+                        <StationAnalytics />
                       </AdminProtectedRoute>
                     }
                   />

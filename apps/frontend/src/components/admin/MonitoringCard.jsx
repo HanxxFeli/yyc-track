@@ -1,10 +1,12 @@
 import { LineChart, Line, ResponsiveContainer, Tooltip } from "recharts";
-
+import { useNavigate } from "react-router-dom";
 /**
  * Monitoring Component
  */
 
 export default function MonitoringCard({ station }) {
+  const navigate = useNavigate();
+
   const lineColor =
     station.line === "Red"
       ? "text-red-600"
@@ -96,7 +98,11 @@ export default function MonitoringCard({ station }) {
           {statusLabel}
         </span>
 
-        <button className="h-9 px-4 rounded-lg border border-red-500 text-sm font-medium text-red-600 hover:bg-red-50">
+        <button
+          className="h-9 px-4 rounded-lg border border-red-500 text-sm font-medium text-red-600 hover:bg-red-50"
+          onClick={() => {
+            navigate(`/admin/stations/${station.id}`);
+          }}>
           View Details
         </button>
       </div>
