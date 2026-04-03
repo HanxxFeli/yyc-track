@@ -65,7 +65,7 @@ export default function AdminDashboard() {
               `${API_URL}/api/admin/analytics/category-averages?period=7d`,
               { headers: authHeader() },
             ),
-            fetch(`${API_URL}/api/admin/analytics/feedback/volume?period=7d`, {
+            fetch(`${API_URL}/api/admin/analytics/volume`, {
               headers: authHeader(),
             }),
             fetch(`${API_URL}/api/admin/analytics/station-rankings`, {
@@ -90,7 +90,7 @@ export default function AdminDashboard() {
         const overall = avgData.data?.averages?.overall;
         setAvgCEI(overall != null ? Math.round(overall * 20) : null);
 
-        setNewFeedback(volumeData.total ?? 0);
+        setNewFeedback(volumeData.totalFeedback ?? 0);
         setBottom5(rankingsData.bottom5 ?? []);
         setRecentPending((pendingData.results ?? []).slice(0, 5));
 
