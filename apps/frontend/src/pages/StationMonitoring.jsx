@@ -173,9 +173,6 @@ export default function StationMonitoring() {
           ))
         )}
       </div>
-
-      {/* Flagged table */}
-      <FlaggedStationsTable rows={[]} />
     </div>
   );
 }
