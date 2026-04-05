@@ -272,6 +272,33 @@ const getStationRankings = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Total feedback count across all stations (last 7 days)
+ * @route   GET /api/admin/analytics/volume
+ * @access  Admin
+ */
+const getFeedbackVolume = async (req, res) => {
+  try {
+    // Last 7 days filter
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
+    const total = await Feedback.countDocuments({
+      isDeleted: false,
+      createdAt: { $gte: sevenDaysAgo },
+      flagStatus: { $ne: "pending" },
+    });
+
+    res.json({
+      period: "7d",
+      totalFeedback: total,
+    });
+  } catch (err) {
+    console.error("getTotalFeedbackAllStations error:", err);
+    res.status(500).json({ error: "Server error. Please try again." });
+  }
+};
+
 // ─────────────────────────────────────────────────────────────────
 // INDIVIDUAL STATION ANALYTICS
 // ─────────────────────────────────────────────────────────────────
@@ -585,6 +612,7 @@ module.exports = {
   getCategoryAverages,
   getSentimentDistribution,
   getStationRankings,
+  getFeedbackVolume,
   // Individual station
   getStationCEITrend,
   getStationCategoryAverages,
