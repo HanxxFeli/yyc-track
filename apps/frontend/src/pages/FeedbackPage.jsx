@@ -33,10 +33,12 @@ const isValidScore = (val) => {
 // Calculate average of 4 scores, returns null if any field is empty
 const computeOverall = (scores) => {
   const vals = Object.values(scores);
-  if (vals.some((v) => v === "")) return null; // Can't calculate average if any score is missing
-  return Math.round(vals.reduce((sum, v) => sum + Number(v), 0) / vals.length); // Average and round
-};
+  if (vals.some((v) => v === "")) return null;
 
+  const avg = vals.reduce((sum, v) => sum + Number(v), 0) / vals.length;
+
+  return Number(avg.toFixed(2)); // keep precision
+};
 const FeedbackPage = () => {
   const { stations, loading: stationsLoading, refreshStations } = useStations();
 

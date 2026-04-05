@@ -31,7 +31,10 @@ const isValidScore = (val) => {
 const computeOverall = (scores) => {
   const vals = Object.values(scores);
   if (vals.some((v) => v === "")) return null;
-  return Math.round(vals.reduce((sum, v) => sum + Number(v), 0) / vals.length);
+
+  const avg = vals.reduce((sum, v) => sum + Number(v), 0) / vals.length;
+
+  return Number(avg.toFixed(2)); // keep precision
 };
 
 export default function FeedbackSubmitForm({

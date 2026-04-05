@@ -63,7 +63,7 @@ export default function StationHeader({ station }) {
           <div
             className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 flex flex-col items-center justify-center ${circleColor}`}>
             <span className="text-xl sm:text-2xl font-bold leading-none">
-              {overall !== null ? overall.toFixed(1) : "—"}
+              {overall !== null ? overall.toFixed(2) : "—"}
             </span>
             <span className="text-xs mt-0.5 opacity-70">/ 5</span>
           </div>
