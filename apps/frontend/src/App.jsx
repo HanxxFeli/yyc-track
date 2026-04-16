@@ -75,12 +75,12 @@ const AppContent = () => {
   const isAdminLogin = location.pathname === "/admin/login";
   return (
     // Outer container: full height, flex column to push footer down
-    <div className="min-h-screen flex flex-col bg-[#F5F6F7]">
+    <div >
       {/* Show AdminHeader ONLY for /admin routes */}
       {isAdminRoute && !isAdminLogin ? <AdminHeader /> : <Header />}
 
       {/* main content area where the page is displayed */}
-      <main className="flex-grow px-4 sm:px-6 lg:px py-6">
+      <main>
         <Routes>
           {/* public pages */}
           <Route path="/" element={<LandingPage />} />
