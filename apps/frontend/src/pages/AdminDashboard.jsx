@@ -12,7 +12,7 @@ import DashboardStats from "../components/admin/DashboardStats";
 import BottomStationsTable from "../components/admin/BottomStations";
 import RecentPendingTable from "../components/admin/RecentPendingTable";
 
-const API_URL = "${import.meta.env.VITE_BACKEND_URL}";
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}`;
 
 const authHeader = () => ({
   Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
