@@ -10,7 +10,10 @@ const mongoose = require('mongoose');
 const connectDB = async () => {
     // Create the connection to the database using URI
     try { 
-        const conn = await mongoose.connect(process.env.MONGODB_URI)
+        const conn = await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 10000, // fail after 10s instead of hanging
+            connectTimeoutMS: 10000
+        })
         console.log(`Connection to YYC-TRACK DB is a Success: ${conn.connection.host}`) // log the host connection
     } 
     catch (error) { 
