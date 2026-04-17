@@ -22,7 +22,7 @@ import StationHeader from "../components/station/StationHeader";
 import FeedbackList from "../components/station/FeedbackList";
 import FeedbackSubmitForm from "../components/station/FeedbackSubmitForm";
 
-const API_URL = "${import.meta.env.VITE_BACKEND_URL}";
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}`;
 
 const isValidScore = (val) => {
   const n = Number(val);
