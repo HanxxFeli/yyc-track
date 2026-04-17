@@ -41,7 +41,7 @@ import CEITrendChart from "../components/analytics/CEITrendChart";
 import CategoryScoresChart from "../components/analytics/CategoryScoresChart";
 import FeedbackSentiment from "../components/analytics/FeedbackSentiment";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
 // Same colour map as DataAnalytics.jsx
 const SENTIMENT_COLOURS = {

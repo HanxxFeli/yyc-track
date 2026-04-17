@@ -14,7 +14,7 @@
 
 const BASE_URL: string =
     (import.meta.env.VITE_AZURE_FUNCTIONS_URL as string) ??
-    "http://localhost:7071/api";
+    "${import.meta.env.VITE_AZURE_FUNCTIONS_URL}";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

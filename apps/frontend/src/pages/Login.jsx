@@ -26,7 +26,7 @@ export default function Login() {
     const result = await login(email, password); // login uses email and password params
 
     if (result.success) {
-      navigate('/dashboard') // always go to dashboard after successful login
+      navigate('/home') // always go to dashboard after successful login
     } else {
       setError(result.message || 'Incorrect email or password.');
     } 
@@ -39,7 +39,7 @@ export default function Login() {
     e.preventDefault();
     console.log('Google sign-in clicked');
     // Add Google OAuth logic here
-    window.location.href = 'http://localhost:5000/api/auth/google'
+    window.location.href = `${import.meta.env.VITE_BACKEND_URL}/api/auth/google`
   };
 
   return (

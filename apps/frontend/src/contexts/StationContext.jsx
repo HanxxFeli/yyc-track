@@ -9,7 +9,7 @@ export const StationProvider = ({ children }) => {
 
   const fetchStations = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/stations`);
+      const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/stations`);
       if (!res.ok) throw new Error("Failed to fetch stations");
       const data = await res.json();
       setStations(data.stations);

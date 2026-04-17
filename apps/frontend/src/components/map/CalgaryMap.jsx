@@ -18,6 +18,7 @@ import { useEffect, useMemo } from "react";
 import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import { useStations } from "../../contexts/StationContext";
 import { useNavigate } from "react-router-dom";
 
@@ -33,7 +34,7 @@ const SetViewOnMount = ({ center, zoom }) => {
 const createIcon = (color) =>
   new L.Icon({
     iconUrl: `https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-${color}.png`,
-    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    shadowUrl: markerShadow,
     iconSize: [25, 41],
     iconAnchor: [12, 41],
   });
@@ -63,10 +64,8 @@ const CalgaryMap = ({ filters = {} }) => {
     sortBy = "none",
   } = filters;
 
-  // Filter + sort — memoized so it only recalculates when filters or stations change
   const filteredStations = useMemo(() => {
     let data = stations.filter((station) => {
-      // Search by name
       if (
         searchQuery &&
         !station.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -74,25 +73,21 @@ const CalgaryMap = ({ filters = {} }) => {
         return false;
       }
 
-      // Transit line
       if (transitLine !== "all") {
         const stationLine = station.line?.toLowerCase();
         if (transitLine === "both") {
           if (stationLine !== "both") return false;
         } else {
-          // "red" matches stations on Red or Both, same for blue
           if (stationLine !== transitLine && stationLine !== "both")
             return false;
         }
       }
 
-      // Category — filter to stations where that category score >= 3.5 (good range)
       if (category) {
         const score = station.averageRatings?.[category];
         if (score == null || score < 3.5) return false;
       }
 
-      // CEI range — based on averageRatings.overall (1-5 scale)
       if (ceiRange) {
         const overall = station.averageRatings?.overall;
         if (overall == null) return false;
@@ -105,7 +100,6 @@ const CalgaryMap = ({ filters = {} }) => {
       return true;
     });
 
-    // Sort
     switch (sortBy) {
       case "cei_desc":
         data = [...data].sort(
@@ -150,6 +144,7 @@ const CalgaryMap = ({ filters = {} }) => {
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          referrerPolicy="no-referrer-when-downgrade"
         />
 
         <SetViewOnMount center={calgaryCenter} zoom={defaultZoom} />

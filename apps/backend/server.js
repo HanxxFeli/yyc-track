@@ -15,14 +15,21 @@ const connectDB = require('./config/mongoDB')
 // initialize Express app 
 const app = express();
 
+// Trust Azure's proxy
+app.set('trust proxy', 1);
+
 // temporary connection to MongoDB (eventually move into try-catch block)
 connectDB();
 
 // Middleware - to be used before routes
 // CORS - allow requests from frontend 
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173', // frontend URL
-  credentials: true // allows cookies to be used
+  origin: [
+    process.env.CLIENT_URL,
+    'http://localhost:5173',
+    'https://gray-stone-0e06b9010.6.azurestaticapps.net'
+  ],
+  credentials: true
 }))
 
 // Parser middleware - allow json to be read from request body
@@ -35,7 +42,9 @@ app.use(session({
   resave: false, 
   saveUninitialized: false,
   cookie: {
-    maxAge: 24 * 60 * 60 * 1000
+    maxAge: 24 * 60 * 60 * 1000,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }));
 
