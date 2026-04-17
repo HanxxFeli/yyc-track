@@ -136,7 +136,7 @@ const AccountSettings = () => {
       const token = localStorage.getItem('authToken'); // get current authtoken from storage
       
       // Call backend to delete account
-      const response = await fetch('http://localhost:5000/api/users/account', {
+      const response = await fetch('${import.meta.env.VITE_BACKEND_URL}/api/users/account', {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -35,7 +35,7 @@ const CompleteProfile = () => {
             }
 
             // call the backend to complete and update the user profile
-            const response = await fetch('http://localhost:5000/api/auth/complete-profile', { 
+            const response = await fetch('${import.meta.env.VITE_BACKEND_URL}/api/auth/complete-profile', { 
                 method: 'PUT',
                 headers: { 
                     'Content-Type': 'application/json',

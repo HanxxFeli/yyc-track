@@ -67,7 +67,7 @@ const ResetPassword = () => {
 
     try {
       // API call to reset password endpoint
-      const response = await fetch(`http://localhost:5000/api/auth/reset-password/${token}`, {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/auth/reset-password/${token}`, {
         method: 'PUT', // PUT method to update password
         headers: {
           'Content-Type': 'application/json'

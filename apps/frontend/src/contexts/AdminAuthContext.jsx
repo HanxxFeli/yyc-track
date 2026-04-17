@@ -25,7 +25,7 @@ export const AdminAuthProvider = ({ children }) => {
     const navigate = useNavigate();
 
     // API base URL that will help connect to the backend
-    const API_URL = "http://localhost:5000/api";
+    const API_URL = `${import.meta.env.VITE_BACKEND_URL}/api`;
 
     // Check if admin already logged in
     useEffect(() => {

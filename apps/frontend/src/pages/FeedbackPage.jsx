@@ -19,7 +19,7 @@ const SCORE_FIELDS = [
 // Added backend feedback integration
 
 // Backend API URL - change this for production
-const API_URL = "http://localhost:5000";
+const API_URL = "${import.meta.env.VITE_BACKEND_URL}";
 
 // Maximum character limit for feedback comments
 const MAX_COMMENT = 1000;

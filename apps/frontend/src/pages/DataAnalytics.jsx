@@ -76,7 +76,7 @@ import CategoryScoresChart from '../components/analytics/CategoryScoresChart';
 import StationRankings from '../components/analytics/StationRankings';
 import FeedbackSentiment from '../components/analytics/FeedbackSentiment';
 
-const API_URL = 'http://localhost:5000/api'; // matches PORT in .env
+const API_URL = '${import.meta.env.VITE_BACKEND_URL}/api'; // matches PORT in .env
 
 // colour map for the 4 sentiment labels the backend returns
 // kept here (not in FeedbackSentiment) because the parent shapes the data before passing it down

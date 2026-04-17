@@ -23,7 +23,7 @@ const mapFeedback = (item) => ({
   submitted: new Date(item.createdAt).toLocaleDateString(),
 });
 
-const API_URI = "http://localhost:5000";
+const API_URI = "${import.meta.env.VITE_BACKEND_URL}";
 
 export default function FeedbackManagement() {
   const { stations } = useStations();
