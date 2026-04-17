@@ -4,7 +4,7 @@ import MonitoringCard from "../components/admin/MonitoringCard";
 import FlaggedStationsTable from "../components/admin/FlaggedStationsTable";
 import { useStations } from "../contexts/StationContext";
 
-const API_URL = "${import.meta.env.VITE_BACKEND_URL}";
+const API_URL = `${import.meta.env.VITE_BACKEND_URL}`;
 
 const monitoringFilters = [
   { type: "search", key: "query", placeholder: "Search by station name..." },
