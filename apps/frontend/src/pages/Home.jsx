@@ -1,45 +1,34 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import 'leaflet/dist/leaflet.css';
+import "leaflet/dist/leaflet.css";
 import StationFilter from "../components/map/StationFilter";
 import CalgaryMap from "../components/map/CalgaryMap";
 
-export default function Home() { 
-  // Filter state: search query, category, and transit line
+export default function Home() {
+  // Filters are owned here and passed down to both StationFilter and CalgaryMap
   const [filters, setFilters] = useState({
-    searchQuery: '',
-    category: '',
-    transitLine: 'all'
+    searchQuery: "",
+    transitLine: "all",
+    category: "",
+    ceiRange: "",
+    sortBy: "none",
   });
 
-  const {user} =useAuth()
+  const { user } = useAuth();
 
-  // Update filters when user interacts with StationFilter component
-  const handleFilterChange = (newFilters) => { 
-    console.log("Filters applied:", newFilters);
-    setFilters(newFilters);
-  };
-
-  return ( 
-    // Main container: proper viewport height calculation
+  return (
     <div className="w-full h-[calc(100vh-64px)] px-4 sm:px-6 lg:px-10 py-4 sm:py-6 lg:py-8">
-      {/* Content wrapper with responsive layout */}
       <div className="flex flex-col lg:flex-row gap-4 sm:gap-5 lg:gap-6 h-full">
-        
-        {/* Filter Component - constrained height to prevent overflow */}
+        {/* Filter sidebar */}
         <div className="w-full lg:w-80 xl:w-96 flex-shrink-0 h-auto lg:h-full lg:max-h-full overflow-hidden">
-          <StationFilter
-            onFilterChange={handleFilterChange}
-            isAuthenticated={user? true : false}
-          />
+          <StationFilter onFilterChange={setFilters} isAuthenticated={!!user} />
         </div>
-      
-        {/* Map Panel */}
+
+        {/* Map */}
         <div className="flex-1 h-[500px] lg:h-full bg-white rounded-lg shadow-lg overflow-hidden z-10">
           <CalgaryMap filters={filters} />
         </div>
-
       </div>
-    </div>    
+    </div>
   );
 }

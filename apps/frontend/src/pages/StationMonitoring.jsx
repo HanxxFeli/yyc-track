@@ -1,21 +1,13 @@
-/**
- * Filter configuration for the Monitoring Page
- * 
- * this uses same reusable FilterBar component but with different configuration
- */
-
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import FilterBar from "../components/FilterBar";
 import MonitoringCard from "../components/admin/MonitoringCard";
 import FlaggedStationsTable from "../components/admin/FlaggedStationsTable";
-import { MOCK_MONITORING_STATIONS, MOCK_FLAGGED_STATIONS } from "../mockMonitoringData";
+import { useStations } from "../contexts/StationContext";
+
+const API_URL = "http://localhost:5000";
 
 const monitoringFilters = [
-  { 
-    type: "search", 
-    key: "query", 
-    placeholder: "Search by station name..." 
-  },
+  { type: "search", key: "query", placeholder: "Search by station name..." },
   {
     type: "select",
     key: "line",
@@ -48,11 +40,9 @@ const monitoringFilters = [
   },
 ];
 
-/**
- * local filter state
- * controls search query, line filter, cei status filter, and sorting
- */
 export default function StationMonitoring() {
+  const { stations, loading: stationsLoading } = useStations();
+
   const [filters, setFilters] = useState({
     query: "",
     line: "all",
@@ -60,46 +50,104 @@ export default function StationMonitoring() {
     sort: "all",
   });
 
-  /**
-   * memoized filtered dataset
-   * - filters by search query
-   * - filters by line
-   * - filters by cei status
-   * - applies selected sorting options
-   * 
-   * useMemo is for making sure that recalculation only when filters change
-   */
+  const [monitoringData, setMonitoringData] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const authHeader = () => ({
+    Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+  });
+
+  // ONLY CEI TREND FETCHING (stations come from context now)
+  useEffect(() => {
+    const fetchMonitoring = async () => {
+      try {
+        if (!stations?.length) return;
+
+        const results = await Promise.all(
+          stations.map(async (station) => {
+            try {
+              const res = await fetch(
+                `${API_URL}/api/admin/analytics/station/${station._id}/cei-trend?period=7d`,
+                { headers: authHeader() },
+              );
+
+              const data = await res.json();
+
+              const trend = data.trend ?? [];
+              const latest = trend[trend.length - 1]?.cei ?? null;
+
+              return {
+                id: station._id,
+                name: station.name,
+                line: station.line,
+                cei: latest,
+                ceiStatus:
+                  latest == null
+                    ? "moderate"
+                    : latest <= 40
+                      ? "poor"
+                      : latest <= 70
+                        ? "moderate"
+                        : "stable",
+                trend,
+              };
+            } catch (err) {
+              console.error("Trend fetch failed:", station.name);
+              return null;
+            }
+          }),
+        );
+
+        setMonitoringData(results.filter(Boolean));
+      } catch (err) {
+        console.error("Monitoring fetch error:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMonitoring();
+  }, [stations]);
+
+  // FILTERING
   const filtered = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
 
-    let data = MOCK_MONITORING_STATIONS
+    let data = monitoringData
       .filter((s) => (q ? s.name.toLowerCase().includes(q) : true))
       .filter((s) => (filters.line === "all" ? true : s.line === filters.line))
       .filter((s) =>
-        filters.ceiStatus === "all" ? true : s.ceiStatus === filters.ceiStatus
+        filters.ceiStatus === "all" ? true : s.ceiStatus === filters.ceiStatus,
       );
 
-    // Sorting options
-    if (filters.sort === "score_desc") data = [...data].sort((a, b) => b.cei - a.cei);
-    if (filters.sort === "score_asc") data = [...data].sort((a, b) => a.cei - b.cei);
-    if (filters.sort === "name_asc") data = [...data].sort((a, b) => a.name.localeCompare(b.name));
+    if (filters.sort === "score_desc")
+      data = [...data].sort((a, b) => (b.cei ?? 0) - (a.cei ?? 0));
+
+    if (filters.sort === "score_asc")
+      data = [...data].sort((a, b) => (a.cei ?? 0) - (b.cei ?? 0));
+
+    if (filters.sort === "name_asc")
+      data = [...data].sort((a, b) => a.name.localeCompare(b.name));
 
     return data;
-  }, [filters]);
+  }, [filters, monitoringData]);
 
-  /**
-   * generic filter update handler
-   * keeps logic centralized and reusable
-   */
-  const onChange = (key, value) => setFilters((prev) => ({ ...prev, [key]: value }));
-  
-  // resets all filters to default values
-  const onClear = () => setFilters({ query: "", line: "all", ceiStatus: "all", sort: "all" });
+  const onChange = (key, value) =>
+    setFilters((prev) => ({ ...prev, [key]: value }));
+
+  const onClear = () =>
+    setFilters({
+      query: "",
+      line: "all",
+      ceiStatus: "all",
+      sort: "all",
+    });
+
+  const isLoading = loading || stationsLoading;
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-
-      {/* Page Header */}
+      {/* Header */}
       <div className="space-y-2">
         <h1 className="text-3xl font-bold text-gray-900">Station Monitoring</h1>
         <p className="text-sm text-gray-600">
@@ -107,18 +155,24 @@ export default function StationMonitoring() {
         </p>
       </div>
 
-      {/* Reusable FilterBar */}
-      <FilterBar filters={monitoringFilters} values={filters} onChange={onChange} onClear={onClear} />
+      {/* Filters */}
+      <FilterBar
+        filters={monitoringFilters}
+        values={filters}
+        onChange={onChange}
+        onClear={onClear}
+      />
 
-      {/* Monitoring Cards Grid */}
+      {/* Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 pt-1">
-        {filtered.map((station) => (
-          <MonitoringCard key={station.id} station={station} />
-        ))}
+        {isLoading ? (
+          <p className="text-gray-400">Loading monitoring data...</p>
+        ) : (
+          filtered.map((station) => (
+            <MonitoringCard key={station.id} station={station} />
+          ))
+        )}
       </div>
-
-      {/* Flagged Stations Table */}
-      <FlaggedStationsTable rows={MOCK_FLAGGED_STATIONS} />
     </div>
   );
 }

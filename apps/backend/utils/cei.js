@@ -8,12 +8,7 @@ const mongoose = require("mongoose");
  * Weighted average of all 5 rating categories across ALL submissions
  * for a station, scaled to 0-100.
  *
- * Weights reflect what matters most to commuters:
- *   Safety:        25%
- *   Overall:       25%
- *   Cleanliness:   20%
- *   Accessibility: 20%
- *   Crowding:      10%
+ *
  *
  * Example: weighted avg = 3.8 out of 5 → CEI = (3.8 / 5) * 100 = 76.0
  *
@@ -22,10 +17,9 @@ const mongoose = require("mongoose");
 
 const WEIGHTS = {
   safety: 0.25,
-  overall: 0.25,
-  cleanliness: 0.2,
-  accessibility: 0.2,
-  crowding: 0.1,
+  cleanliness: 0.25,
+  accessibility: 0.25,
+  crowding: 0.25,
 };
 
 const recalculateStationCEI = async (stationId) => {
@@ -42,12 +36,12 @@ const recalculateStationCEI = async (stationId) => {
       // Step 2: Group all feedback together and compute per-category averages
       $group: {
         _id: "$stationId",
-        totalFeedback:    { $sum: 1 },
-        avgSafety:        { $avg: "$ratings.safety" },
-        avgCleanliness:   { $avg: "$ratings.cleanliness" },
+        totalFeedback: { $sum: 1 },
+        avgSafety: { $avg: "$ratings.safety" },
+        avgCleanliness: { $avg: "$ratings.cleanliness" },
         avgAccessibility: { $avg: "$ratings.accessibility" },
-        avgCrowding:      { $avg: "$ratings.crowding" },
-        avgOverall:       { $avg: "$ratings.overall" },
+        avgCrowding: { $avg: "$ratings.crowding" },
+        avgOverall: { $avg: "$ratings.overall" },
       },
     },
     {
@@ -58,11 +52,11 @@ const recalculateStationCEI = async (stationId) => {
 
         // Store rounded per-category averages for the station dashboard charts
         averageRatings: {
-          safety:        { $round: ["$avgSafety", 2] },
-          cleanliness:   { $round: ["$avgCleanliness", 2] },
+          safety: { $round: ["$avgSafety", 2] },
+          cleanliness: { $round: ["$avgCleanliness", 2] },
           accessibility: { $round: ["$avgAccessibility", 2] },
-          crowding:      { $round: ["$avgCrowding", 2] },
-          overall:       { $round: ["$avgOverall", 2] },
+          crowding: { $round: ["$avgCrowding", 2] },
+          overall: { $round: ["$avgOverall", 2] },
         },
 
         // Weighted average then scaled: (weightedAvg / 5) * 100
@@ -72,14 +66,13 @@ const recalculateStationCEI = async (stationId) => {
               $multiply: [
                 {
                   $add: [
-                    { $multiply: ["$avgSafety",        WEIGHTS.safety] },
-                    { $multiply: ["$avgCleanliness",   WEIGHTS.cleanliness] },
+                    { $multiply: ["$avgSafety", WEIGHTS.safety] },
+                    { $multiply: ["$avgCleanliness", WEIGHTS.cleanliness] },
                     { $multiply: ["$avgAccessibility", WEIGHTS.accessibility] },
-                    { $multiply: ["$avgCrowding",      WEIGHTS.crowding] },
-                    { $multiply: ["$avgOverall",       WEIGHTS.overall] },
+                    { $multiply: ["$avgCrowding", WEIGHTS.crowding] },
                   ],
                 },
-                20, // scale 1-5 range to 20-100
+                20,
               ],
             },
             1, // round to 1 decimal place

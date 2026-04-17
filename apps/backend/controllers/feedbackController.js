@@ -2,6 +2,7 @@ const Feedback = require("../models/Feedback");
 const Station = require("../models/Station");
 const User = require("../models/User");
 const { recalculateStationCEI } = require("../utils/cei");
+const { analyzeSentiment } = require("../utils/sentimentAnalysis");
 const { analyzeContent } = require("../utils/contentSafety");
 
 /**
@@ -28,7 +29,6 @@ const submitFeedback = async (req, res) => {
       "cleanliness",
       "accessibility",
       "crowding",
-      "overall",
     ];
     for (const field of requiredFields) {
       if (ratings[field] === undefined || ratings[field] === null) {
@@ -39,7 +39,10 @@ const submitFeedback = async (req, res) => {
     }
 
     // Run comment through Azure Content Safety
-    const safetyResult = await analyzeContent(comment);
+    const [safetyResult, sentimentLabel] = await Promise.all([
+      analyzeContent(comment),
+      analyzeSentiment(comment),
+    ]);
     const flagStatus = safetyResult.flagged ? "pending" : "none";
 
     const feedback = await Feedback.create({
@@ -47,6 +50,7 @@ const submitFeedback = async (req, res) => {
       stationId,
       ratings,
       comment,
+      sentiment: sentimentLabel,
       flagStatus,
     });
 
@@ -56,7 +60,8 @@ const submitFeedback = async (req, res) => {
       message: "Feedback submitted successfully.",
       feedbackId: feedback._id,
       ...(safetyResult.flagged && {
-        notice: "Your comment is under review and will be visible once approved.",
+        notice:
+          "Your comment is under review and will be visible once approved.",
       }),
     });
   } catch (err) {
@@ -84,15 +89,15 @@ const getFeedbackByStation = async (req, res) => {
       sort === "oldest"
         ? { createdAt: 1 }
         : sort === "rating"
-        ? { "ratings.overall": -1 }
-        : { createdAt: -1 };
+          ? { "ratings.overall": -1 }
+          : { createdAt: -1 };
 
     const feedback = await Feedback.find({
       stationId,
       isDeleted: false,
       flagStatus: { $ne: "pending" }, // show "none" and "archived"
     })
-      .populate("userId", "username")
+      .populate("userId", "firstName")
       .sort(sortOption);
 
     res.json({
@@ -147,7 +152,7 @@ const deleteFeedback = async (req, res) => {
         .json({ error: "You are not authorized to delete this feedback." });
     }
 
-    await feedback.deleteOne()
+    await feedback.deleteOne();
 
     await recalculateStationCEI(feedback.stationId);
 
@@ -293,6 +298,33 @@ const adminDeleteFeedback = async (req, res) => {
   }
 };
 
+/**
+ * @desc    Admin Reverts any Chanages they made to a feedback
+ * @route   PATCH /api/feedback/admin/:feedbackId/revert
+ * @access  Admin
+ */
+const adminRevertFeedback = async (req, res) => {
+  try {
+    const feedback = await Feedback.findById(req.params.feedbackId);
+    if (!feedback) {
+      return res.status(404).json({ error: "Feedback not found." });
+    }
+
+    const stationId = feedback.stationId;
+
+    //Revert to 'pending' and isDeleted back to false
+    feedback.isDeleted = false;
+    feedback.flagStatus = "pending";
+    await feedback.save();
+    await recalculateStationCEI(stationId);
+
+    res.json({ message: "Feedback Status Reverted" });
+  } catch (err) {
+    console.error("adminRevertFeedback error:", err);
+    res.status(500).json({ error: "Server error. Please try again." });
+  }
+};
+
 module.exports = {
   submitFeedback,
   getFeedbackByStation,
@@ -302,5 +334,6 @@ module.exports = {
   getArchivedFeedback,
   approveFeedback,
   adminDeleteFeedback,
-  getDeletedFeedback
+  getDeletedFeedback,
+  adminRevertFeedback,
 };

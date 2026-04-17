@@ -1,8 +1,8 @@
-import { useMemo, useState, useEffect } from 'react';
-import FilterBar from '../components/FilterBar';
-import FeedbackToReviewTable from '../components/admin/FeedbackToReviewTable';
-import FeedbackArchive from '../components/admin/FeedbackArchive';
-import { useStations } from '../contexts/StationContext';
+import { useMemo, useState, useEffect } from "react";
+import FilterBar from "../components/FilterBar";
+import FeedbackToReviewTable from "../components/admin/FeedbackToReviewTable";
+import FeedbackArchive from "../components/admin/FeedbackArchive";
+import { useStations } from "../contexts/StationContext";
 
 /**
  * Maps a raw API pending feedback item to the shape
@@ -15,25 +15,34 @@ const mapFeedback = (item) => ({
   line: item.stationId?.line ?? "",
   feedback: item.comment ?? "",
   categoryRatings: {
-    cleanliness:   item.ratings?.cleanliness   ?? "N/A",
-    safety:        item.ratings?.safety         ?? "N/A",
-    accessibility: item.ratings?.accessibility  ?? "N/A",
-    crowding:      item.ratings?.crowding       ?? "N/A",
+    cleanliness: item.ratings?.cleanliness ?? "N/A",
+    safety: item.ratings?.safety ?? "N/A",
+    accessibility: item.ratings?.accessibility ?? "N/A",
+    crowding: item.ratings?.crowding ?? "N/A",
   },
   submitted: new Date(item.createdAt).toLocaleDateString(),
 });
 
-const API_URI='http://localhost:5000'
+const API_URI = "http://localhost:5000";
 
 export default function FeedbackManagement() {
   const { stations } = useStations();
 
+  /**
+   * states
+   *
+   * toReview -> pending feedback
+   * approved -> approved feedback
+   * rejected -> rejected feedback
+   */
   const [toReview, setToReview] = useState([]);
   const [approved, setApproved] = useState([]);
   const [rejected, setRejected] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // filter state (controls the search, station filter, and sorting)
   const [filters, setFilters] = useState({
     query: "",
     station: "all",
@@ -72,6 +81,7 @@ export default function FeedbackManagement() {
     },
   ];
 
+  // auth header for admin API calls
   const authHeader = {
     Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
   };
@@ -81,9 +91,15 @@ export default function FeedbackManagement() {
     const fetchFeedback = async () => {
       try {
         const [pendingRes, archivedRes, deletedRes] = await Promise.all([
-          fetch(`${API_URI}/api/feedback/admin/pending`, { headers: authHeader }),
-          fetch(`${API_URI}/api/feedback/admin/archived`, { headers: authHeader }),
-          fetch(`${API_URI}/api/feedback/admin/deleted`, { headers: authHeader }),
+          fetch(`${API_URI}/api/feedback/admin/pending`, {
+            headers: authHeader,
+          }),
+          fetch(`${API_URI}/api/feedback/admin/archived`, {
+            headers: authHeader,
+          }),
+          fetch(`${API_URI}/api/feedback/admin/deleted`, {
+            headers: authHeader,
+          }),
         ]);
 
         if (!pendingRes.ok || !archivedRes.ok || !deletedRes.ok) {
@@ -109,6 +125,15 @@ export default function FeedbackManagement() {
     fetchFeedback();
   }, []);
 
+  /**
+   * filter + search logic
+   *
+   * - runs whenever filters or data change
+   * - filters by:
+   *  - search query
+   *  - station
+   *  - sorting option
+   */
   const filteredToReview = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
     let data = [...toReview];
@@ -136,11 +161,18 @@ export default function FeedbackManagement() {
     return data;
   }, [toReview, filters]);
 
+  // updates a specific filter
   const onChange = (key, value) =>
     setFilters((prev) => ({ ...prev, [key]: value }));
 
+  // resets all filters back to default
   const onClear = () =>
-    setFilters({ query: "", station: "all", status: "needs_review", sort: "newest" });
+    setFilters({
+      query: "",
+      station: "all",
+      status: "needs_review",
+      sort: "newest",
+    });
 
   /**
    * Approve — calls PATCH /api/feedback/admin/:id/approve
@@ -148,10 +180,10 @@ export default function FeedbackManagement() {
    */
   const onApprove = async (id) => {
     try {
-      const res = await fetch(
-        `${API_URI}/api/feedback/admin/${id}/approve`,
-        { method: "PATCH", headers: authHeader }
-      );
+      const res = await fetch(`${API_URI}/api/feedback/admin/${id}/approve`, {
+        method: "PATCH",
+        headers: authHeader,
+      });
 
       if (!res.ok) throw new Error("Failed to approve feedback.");
 
@@ -171,10 +203,10 @@ export default function FeedbackManagement() {
    */
   const onReject = async (id) => {
     try {
-      const res = await fetch(
-        `${API_URI}/api/feedback/admin/${id}`,
-        { method: "DELETE", headers: authHeader }
-      );
+      const res = await fetch(`${API_URI}/api/feedback/admin/${id}`, {
+        method: "DELETE",
+        headers: authHeader,
+      });
 
       if (!res.ok) throw new Error("Failed to reject feedback.");
 
@@ -188,12 +220,64 @@ export default function FeedbackManagement() {
     }
   };
 
+  /**
+   * undo (approved back to review)
+   * undoApprove — calls PATCH /api/feedback/admin/:id/revert
+   *
+   * - moves item back to "toReview"
+   * - frontend only rn
+   */
+  const handleUndoApproved = async (id) => {
+    try {
+      const res = await fetch(`${API_URI}/api/feedback/admin/${id}/revert`, {
+        method: "PATCH",
+        headers: authHeader,
+      });
+
+      if (!res.ok) throw new Error("Failed to undo Feedback.", res.json());
+
+      const item = approved.find((f) => f.id === id);
+      if (!item) return;
+
+      setApproved((prev) => prev.filter((f) => f.id !== id));
+      setToReview((prev) => [item, ...prev]);
+    } catch (err) {
+      console.error("undoApproved error:", err);
+    }
+  };
+
+  /**
+   * undo (reject back to review)
+   *
+   * - moved item back to "toReview
+   * - frontend only rn
+   */
+  const handleUndoRejected = async (id) => {
+    try {
+      const res = await fetch(`${API_URI}/api/feedback/admin/${id}/revert`, {
+        method: "PATCH",
+        headers: authHeader,
+      });
+
+      if (!res.ok) throw new Error("Failed to undo Feedback.");
+
+      const item = rejected.find((f) => f.id === id);
+      if (!item) return;
+
+      setRejected((prev) => prev.filter((f) => f.id !== id));
+      setToReview((prev) => [item, ...prev]);
+    } catch (err) {
+      console.error("undoRejected error:", err);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-
       {/* Page Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-gray-900">Feedback Management</h1>
+        <h1 className="text-3xl font-bold text-gray-900">
+          Feedback Management
+        </h1>
         <p className="text-sm text-gray-600">
           Review, moderate, and archive user-submitted feedback.
         </p>
@@ -223,6 +307,8 @@ export default function FeedbackManagement() {
           <FeedbackArchive
             approved={approved}
             rejected={rejected}
+            onUndoApproved={handleUndoApproved}
+            onUndoRejected={handleUndoRejected}
           />
         </>
       )}

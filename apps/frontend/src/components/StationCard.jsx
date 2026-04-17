@@ -1,9 +1,9 @@
 /**
  * StationCard Component
- * 
+ *
  * Displays a summary card for a single station
- * 
- * Props: 
+ *
+ * Props:
  * - station: {
  *     id.
  *     name,
@@ -21,9 +21,9 @@
  */
 
 import StatusBadge from "./StatusBadge";
+import { useNavigate } from "react-router-dom";
 
 export default function StationCard({ station }) {
-
   /**
    * determines text color based on station list
    * keeps styling logic centralized instead of scattering
@@ -33,24 +33,22 @@ export default function StationCard({ station }) {
     station.line === "Red"
       ? "text-red-600"
       : station.line === "Blue"
-      ? "text-blue-600"
-      : station.line === "Dual"
-      ? "text-purple-600"
-      : "text-gray-700";
+        ? "text-blue-600"
+        : station.line === "Dual"
+          ? "text-purple-600"
+          : "text-gray-700";
 
   /**
    * determines label text for line
    * dual is intentionally simplified
    */
-  const lineLabel =
-    station.line === "Dual"
-      ? "Dual"
-      : `${station.line} Line`;
+  const lineLabel = station.line === "Dual" ? "Dual" : `${station.line} Line`;
+
+  const navigate = useNavigate();
 
   return (
     <div className="rounded-xl bg-white border border-gray-200 shadow-sm px-6 py-5">
       <div className="flex gap-6">
-        
         {/* Station Image */}
         <div className="h-28 w-40 rounded-lg bg-gray-100 overflow-hidden shrink-0">
           <img
@@ -62,7 +60,6 @@ export default function StationCard({ station }) {
 
         {/* Main content wrapper */}
         <div className="flex-1 flex flex-col justify-between">
-          
           {/* Top Row: Title + Line + Condition */}
           <div className="flex justify-between items-start">
             <div>
@@ -93,8 +90,7 @@ export default function StationCard({ station }) {
               {station.metrics.cleanliness}{" "}
               <span className="text-gray-400">|</span>{" "}
               <span className="font-medium">Safety:</span>{" "}
-              {station.metrics.safety}{" "}
-              <span className="text-gray-400">|</span>{" "}
+              {station.metrics.safety} <span className="text-gray-400">|</span>{" "}
               <span className="font-medium">Accessibility:</span>{" "}
               {station.metrics.accessibility}{" "}
               <span className="text-gray-400">|</span>{" "}
@@ -105,7 +101,9 @@ export default function StationCard({ station }) {
 
           {/* Bottom Section: Button */}
           <div className="flex justify-end mt-4">
-            <button className="h-9 px-4 rounded-lg border border-red-500 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+            <button
+              onClick={() => navigate(`/stations/${station.id}`)}
+              className="h-9 px-4 rounded-lg border border-red-500 text-sm font-medium text-red-600 hover:bg-red-50 transition">
               View Details
             </button>
           </div>

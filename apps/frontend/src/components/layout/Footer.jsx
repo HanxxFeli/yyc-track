@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
-
+// import PrivacyPolicy from "../../pages/PrivacyPolicy";
+// import TermsOfService from "../../pages/TermsOfService";
 /**
  * Footer Component
  * 

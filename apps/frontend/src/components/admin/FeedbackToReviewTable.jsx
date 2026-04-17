@@ -1,25 +1,61 @@
+import { useState } from "react";
 import FeedbackStatusBadge from "./FeedbackStatusBadge";
 
 /**
  * FeedbackToReviewTable Component
- * 
+ *
  * - Displays a table of feedback items that are pending review
  * - Admin users can review each entry and either approve or reject the feedback
  */
 export default function FeedbackToReviewTable({ rows, onApprove, onReject }) {
+  /** 
+   * state for confirmation flow
+   * - confirmingId: which row is currently in "confirm mode"
+   * - confirmAction: whether the user clicked approve or reject
+   */
+  const [confirmingId, setConfirmingId] = useState(null);
+  const [confirmAction, setConfirmAction] = useState(null); // null | "approve" | "reject"
+
+  /**
+   * triggered when user clicks approve or reject
+   * - switches that row into confirmation mode
+   * - stores which action was selected
+   */
+  const startConfirm = (id, action) => {
+    setConfirmingId(id);
+    setConfirmAction(action);
+  };
+
+  /**
+   * cancels confirmation mode
+   * - resets state so the buttons return normal
+   */
+  const cancelConfirm = () => {
+    setConfirmingId(null);
+    setConfirmAction(null);
+  };
+
+  /**
+   * final confirmation handler
+   * - calls parent function (onApprove or onReject)
+   * - exits confirmation mode
+   */
+  const handleConfirm = (id) => {
+    if (confirmAction === "approve") {
+      onApprove(id);
+    } else if (confirmAction === "reject") {
+      onReject(id);
+    }
+
+    cancelConfirm();
+  };
+
   return (
     <div className="rounded-xl bg-white border border-gray-200 shadow-sm p-6">
-      
-      {/* Section Title */}
-      <h2 className="text-xl font-bold text-gray-900">
-        Feedback to Review
-      </h2>
+      <h2 className="text-xl font-bold text-gray-900">Feedback to Review</h2>
 
-      {/* Table Container with horizontal scroll on small screens */}
       <div className="mt-4 overflow-x-auto">
         <table className="w-full text-left">
-
-          {/* Table Header */}
           <thead>
             <tr className="text-sm font-semibold text-gray-700 border-b">
               <th className="py-3 pr-4">User</th>
@@ -31,10 +67,7 @@ export default function FeedbackToReviewTable({ rows, onApprove, onReject }) {
             </tr>
           </thead>
 
-          {/* Table Body */}
           <tbody>
-
-            {/* Empty State */}
             {rows.length === 0 ? (
               <tr>
                 <td className="py-6 text-sm text-gray-500" colSpan={6}>
@@ -42,21 +75,16 @@ export default function FeedbackToReviewTable({ rows, onApprove, onReject }) {
                 </td>
               </tr>
             ) : (
-
-              // Render each feedback row dynamically
               rows.map((row) => (
                 <tr
                   key={row.id}
                   className="border-b last:border-b-0 text-sm text-gray-900 align-top"
                 >
-
-                  {/* User Info with Submission Date */}
                   <td className="py-4 pr-4">
                     <div className="font-medium">{row.user}</div>
                     <div className="mt-1 text-xs text-gray-500">{row.submitted}</div>
                   </td>
 
-                  {/* Station and Line Info */}
                   <td className="py-4 pr-4">
                     <div className="font-medium">{row.station}</div>
                     <div className="mt-1 text-xs text-gray-500">
@@ -64,10 +92,8 @@ export default function FeedbackToReviewTable({ rows, onApprove, onReject }) {
                     </div>
                   </td>
 
-                  {/* Feedback Text */}
                   <td className="py-4 pr-4 max-w-[260px]">{row.feedback}</td>
 
-                  {/* Category Ratings */}
                   <td className="py-4 pr-4 text-sm">
                     <div>Cleanliness: {row.categoryRatings.cleanliness}</div>
                     <div>Safety: {row.categoryRatings.safety}</div>
@@ -75,32 +101,62 @@ export default function FeedbackToReviewTable({ rows, onApprove, onReject }) {
                     <div>Crowding: {row.categoryRatings.crowding}</div>
                   </td>
 
-                  {/* Status Badge */}
                   <td className="py-4 pr-4 align-top">
                     <div className="pt-1">
                       <FeedbackStatusBadge status="needs_review" />
                     </div>
                   </td>
 
-                  {/* Action Buttons */}
                   <td className="py-4 text-right">
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-end gap-3 items-center">
 
-                      {/* Approve Button */}
-                      <button
-                        onClick={() => onApprove(row.id)}
-                        className="h-8 px-3 rounded-lg border border-green-500 text-xs font-medium text-green-600 hover:bg-green-50 transition"
-                      >
-                        Approve
-                      </button>
+                      {/* CONDITIONAL RENDERING:
+                          - if this row is being confirmed, show cancel + confirm buttons 
+                          - otherwise show the approve and reject buttons */}
+                      {confirmingId === row.id ? (
+                        <>
 
-                      {/* Reject Button */}
-                      <button
-                        onClick={() => onReject(row.id)}
-                        className="h-8 px-3 rounded-lg border border-red-500 text-xs font-medium text-red-600 hover:bg-red-50 transition"
-                      >
-                        Reject
-                      </button>
+                          {/* Cancel Button */}
+                          <button
+                            onClick={cancelConfirm}
+                            className="h-9 px-5 rounded-xl text-sm font-medium border border-gray-300 text-gray-700 bg-white hover:bg-gray-100 transition-all duration-150"
+                          >
+                            Cancel
+                          </button>
+
+                          {/* Confirm Button:
+                              - dynamically changes based on selected action (approve/reject)
+                              - calls the handleConfirm to finalize the action */}
+                          <button
+                            onClick={() => handleConfirm(row.id)}
+                            className={`h-9 px-5 rounded-xl text-sm font-medium text-white transition-all duration-150 ${
+                              confirmAction === "approve"
+                                ? "bg-green-500 hover:bg-green-600"
+                                : "bg-red-400 hover:bg-red-600"
+                            }`}
+                          >
+                            Confirm {confirmAction === "approve" ? "Approve" : "Reject"}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {/* Approve Button */}
+                          <button
+                            onClick={() => startConfirm(row.id, "approve")}
+                            className="h-8 px-4 rounded-lg border border-green-500 text-sm font-medium text-green-600 bg-white hover:bg-green-50 transition-all duration-150"
+                          >
+                            Approve
+                          </button>
+                          
+                          {/* Reject Button */}
+                          <button
+                            onClick={() => startConfirm(row.id, "reject")}
+                            className="h-8 px-4 rounded-lg border border-red-500 text-sm font-medium text-red-600 bg-white hover:bg-red-50 transition-all duration-150"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>
