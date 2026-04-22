@@ -50,7 +50,7 @@ const CompleteProfile = () => {
 
             // payload will contain a success and message field so get the value from those 
             if (data.success) { 
-                navigate('/dashboard')
+                navigate('/map')
             } else { 
                 setError(data.message || 'Failed to update profile. Please try again')
             }
