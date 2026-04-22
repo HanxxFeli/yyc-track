@@ -16,7 +16,7 @@ export default function Login() {
   const { login, user } = useAuth(); // use login from authcontext
   const navigate = useNavigate();
   if (user){
-    navigate('/home') // If user is already logged in, redirect to home page
+    navigate('/map') // If user is already logged in, redirect to home page
   }
 
   const handleLogin = async (e) => {
@@ -28,7 +28,7 @@ export default function Login() {
     const result = await login(email, password); // login uses email and password params
 
     if (result.success) {
-      navigate('/home') // always go to dashboard after successful login
+      navigate('/map') // always go to dashboard after successful login
     } else {
       setError(result.message || 'Incorrect email or password.');
     } 

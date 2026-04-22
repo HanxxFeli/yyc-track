@@ -49,7 +49,7 @@ const Register = () => {
   const navigate = useNavigate(); // React Router navigation
 
   if (user){
-    navigate('/home') // If user is already logged in, redirect to home page
+    navigate('/map') // If user is already logged in, redirect to home page
   }
 
   // Handle all input changes (both text inputs and checkbox)
