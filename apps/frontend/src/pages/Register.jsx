@@ -45,8 +45,12 @@ const Register = () => {
   const [success, setSuccess] = useState(false); // Success state to show success message
 
   // Get register function from AuthContext
-  const { register } = useAuth(); // register function handles API call to backend
+  const { register, user } = useAuth(); // register function handles API call to backend
   const navigate = useNavigate(); // React Router navigation
+
+  if (user){
+    navigate('/home') // If user is already logged in, redirect to home page
+  }
 
   // Handle all input changes (both text inputs and checkbox)
   const handleChange = (e) => {

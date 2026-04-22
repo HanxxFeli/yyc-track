@@ -13,9 +13,11 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
 
   // login related states
-  const { login } = useAuth(); // use login from authcontext
+  const { login, user } = useAuth(); // use login from authcontext
   const navigate = useNavigate();
-  
+  if (user){
+    navigate('/home') // If user is already logged in, redirect to home page
+  }
 
   const handleLogin = async (e) => {
     e.preventDefault();
